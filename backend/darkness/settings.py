@@ -40,11 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'roboIF'
+    'roboIF',
+    'darkness'
+
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    #'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -55,7 +57,7 @@ MIDDLEWARE = [
     'django',
 ]
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = 'darkness.urls'
 
 TEMPLATES = [
     {
@@ -73,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'darkness.wsgi.application'
 
 
 # Database
