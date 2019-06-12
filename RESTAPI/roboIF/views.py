@@ -1,4 +1,3 @@
-import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
@@ -7,7 +6,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, viewsets
 
 from .serializers import RobotSerializer
 from .models import Robot
@@ -16,9 +15,13 @@ from .models import Robot
 class RobotList(APIView):
 
     def get(self, request):
-        robs = Robot.objects.all()
+        robs = Robot.robot_manager.all()
         serializer = RobotSerializer(robs, many=True)
         return Response(serializer.data)
+
+class RobotView(viewsets.ModelViewSet):
+    queryset = Robot.manager().all()
+    serializer_cls = RobotSerializer()
 
 
 def list_models(model, uid):
@@ -32,7 +35,7 @@ def list_models(model, uid):
 def index(request):
 
     if request.method == 'GET':
-        get_object_or404()
+        #get_object_or404()
         pass
 
     if request.method == 'POST':

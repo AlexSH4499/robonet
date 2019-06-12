@@ -1,5 +1,6 @@
 from django.db import models
 
+# Create your models here.
 # The Robot to use in facility
 class Robot(models.Model):
     class Meta:
