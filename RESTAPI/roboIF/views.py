@@ -8,20 +8,21 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 
-from .serializers import RobotSerializer
-from .models import Robot
+from roboIF.serializers import RobotSerializer
+from roboIF.models import Robot
 
 #/robots
 class RobotList(APIView):
 
     def get(self, request):
-        robs = Robot.robot_manager.all()
-        serializer = RobotSerializer(robs, many=True)
+        robs = Robot.objects.all()
+        #serializer = RobotSerializer(robs, many=True)
+        serializer = RobotSerializer
         return Response(serializer.data)
 
 class RobotView(viewsets.ModelViewSet):
-    queryset = Robot.manager().all()
-    serializer_cls = RobotSerializer()
+    queryset = Robot.objects.all()
+    serializer_class = RobotSerializer
 
 
 def list_models(model, uid):

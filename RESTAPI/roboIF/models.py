@@ -12,35 +12,35 @@ class Robot(models.Model):
         ('ERR','ERROR')
     )
 
-    robot_manager = models.Manager()
+    #robot_manager = models.Manager()
 
     uid = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=20)
     status = models.CharField(max_length=15, choices=STATUS)
     location = models.CharField(max_length=15)#Physicial World Positioning
 
-    def properties():
-        return ('uid', 'name', 'status', 'location')
-    @property
-    def status(self):
-        return self.status
-
-    @property
-    def name(self):
-        return self.name
-
-    @property
-    def unique_id(self):
-        return self.uid
-
-    @property
-    def manager(self):
-        return self.robot_manager
-
-    @property
-    def get_by_uid(self, id):
-
-        return self.manager().filter(uid=id)
+    # def properties():
+    #     return ('uid', 'name', 'status', 'location')
+    # @property
+    # def status(self):
+    #     return self.status
+    #
+    # @property
+    # def name(self):
+    #     return self.name
+    #
+    # @property
+    # def unique_id(self):
+    #     return self.uid
+    #
+    # # @property
+    # # def manager(self):
+    # #     return self.robot_manager
+    #
+    # @property
+    # def get_by_uid(self, id):
+    #
+    #     return self.manager().filter(uid=id)
 
     def create_robot(id, name, stat, loc):
         return Robot(uid=id, name=name, status=stat, location=loc)
