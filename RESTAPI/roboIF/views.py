@@ -23,11 +23,12 @@ from roboIF.models import Robot, WareHouse
 class RobotView(viewsets.ModelViewSet):
     queryset = Robot.objects.all()
     serializer_class = RobotSerializer
+    #permissions_classes = (permissions.IsAuthenticatedOrReadOnly)
 
 class WareHouseView(viewsets.ModelViewSet):
     queryset = WareHouse.objects.all()
     serializer_class = WareHouseSerializer
-
+    #permissions_classes = (permissions.IsAuthenticatedOrReadOnly)
 
 def list_models(model, uid):
     try:
@@ -38,20 +39,22 @@ def list_models(model, uid):
 
 # Create your views here.
 def index(request):
+    print(request.headers)
 
-    if request.method == 'GET':
-        #get_object_or404()
-        pass
-
-    if request.method == 'POST':
-        pass
-
-    if request.method == 'DELETE':
-        pass
-
-    if request.method == 'PUT':
-        pass
-
-    else:
-        #raise Error()
-        pass
+    return render(request, 'debugging/index.html', {'headers':request.headers})
+    # if request.method == 'GET':
+    #     #get_object_or404()
+    #     pass
+    #
+    # if request.method == 'POST':
+    #     pass
+    #
+    # if request.method == 'DELETE':
+    #     pass
+    #
+    # if request.method == 'PUT':
+    #     pass
+    #
+    # else:
+    #     #raise Error()
+    #     pass
