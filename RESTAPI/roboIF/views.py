@@ -6,23 +6,27 @@ from django.http import HttpResponse, HttpResponseNotFound
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, permissions
 
-from roboIF.serializers import RobotSerializer
-from roboIF.models import Robot
+from roboIF.serializers import *
+from roboIF.models import Robot, WareHouse
 
 #/robots
-class RobotList(APIView):
-
-    def get(self, request):
-        robs = Robot.objects.all()
-        #serializer = RobotSerializer(robs, many=True)
-        serializer = RobotSerializer
-        return Response(serializer.data)
+# class RobotList(APIView):
+#
+#     def get(self, request):
+#         robs = Robot.objects.all()
+#         #serializer = RobotSerializer(robs, many=True)
+#         serializer = RobotSerializer
+#         return Response(serializer.data)
 
 class RobotView(viewsets.ModelViewSet):
     queryset = Robot.objects.all()
     serializer_class = RobotSerializer
+
+class WareHouseView(viewsets.ModelViewSet):
+    queryset = WareHouse.objects.all()
+    serializer_class = WareHouseSerializer
 
 
 def list_models(model, uid):

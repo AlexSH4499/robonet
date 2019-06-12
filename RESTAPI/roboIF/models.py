@@ -56,7 +56,7 @@ class WareHouse(models.Model):
     class Meta:
         ordering = ['uid', 'name']
 
-    manager = models.Manager()
+    #manager = models.Manager()
     uid = models.IntegerField(primary_key=True)
     robots = models.ManyToManyField(Robot)
     name = models.CharField(max_length=30)
