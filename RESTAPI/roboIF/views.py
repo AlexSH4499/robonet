@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
-
+from rest_framework.decorators import action
 from roboIF.serializers import *
 from roboIF.models import Robot, WareHouse
 
@@ -23,6 +23,14 @@ from roboIF.models import Robot, WareHouse
 class RobotView(viewsets.ModelViewSet):
     queryset = Robot.objects.all()
     serializer_class = RobotSerializer
+
+    @action(methods=['put'], detail=True, permission_classes=[IsAdminOrIsSelf])
+    def set_status(self,request, pk=None):
+        if pk is None:
+            msg ="Error Invalid private key"
+            return HtttpResponse(msg, status_code=404)
+
+        robot = queryset.filter
     #permissions_classes = (permissions.IsAuthenticatedOrReadOnly)
 
 class WareHouseView(viewsets.ModelViewSet):
