@@ -13,15 +13,14 @@ class Robot(models.Model):
         ('ERR','ERROR')
     )
 
-    #robot_manager = models.Manager()
     objects = RobotManager()
     uid = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=20)
     status = models.CharField(max_length=15, choices=STATUS)
     warehouse_id = models.ForeignKey(WareHouse, on_delete=models.CASCADE)#Physicial World Positioning
 
-    # def properties():
-    #     return ('uid', 'name', 'status', 'location')
+    def properties():
+        return ('uid', 'name', 'status', 'location')
     # @property
     # def status(self):
     #     return self.status
@@ -82,7 +81,7 @@ class RobotManager(models.Manager):
 
         return
 
-    def get_queryset(self) -> RobotQuerySet:
+    def get_queryset(self)-> RobotQuerySet:
         queryset = RobotQuerySet(
             model = self.model,
             using = self._db,
@@ -90,7 +89,7 @@ class RobotManager(models.Manager):
         )
 
         if self._warehouse_id is not None:
-            queryset queryset.filter(warehouse_id=self._warehouse_id)
+            queryset = queryset.filter(warehouse_id=self._warehouse_id)
 
         return queryset
 
@@ -115,8 +114,6 @@ class RobotManager(models.Manager):
         queryset = self.get_queryset()
         return queryset.filter(location=warehouse_id)
 
-def factory_manager_for_warehouse(warehouse_id):
-    return RobotManager.factory(model=Robot, warehouse_id=warehouse_id)
 
 
 class WareHouseManager(models.Manager):
