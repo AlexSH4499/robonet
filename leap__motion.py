@@ -33,30 +33,41 @@ def is_previous(curr_frame,prev_id):
 
 def main():
 
-    listener = SampleListener()
+    # listener = ContextAwareListener()
     controller = Leap.Controller()
 
     while not controller.is_connected():
         #wait here doing whatever
         print("...")
     #print("Controller Connected...\n\n")
+    with ContextAwareListener(controller) as listener:
+    # controller.add_listener(listener)
 
-    controller.add_listener(listener)
+        # Keep this process running until Enter is pressed
+        print("Press Enter to quit...")
+        try:
+            sys.stdin.readline()
+        except KeyboardInterrupt:
+            pass
 
-    # Keep this process running until Enter is pressed
-    print("Press Enter to quit...")
-    try:
-        sys.stdin.readline()
-    except KeyboardInterrupt:
-        pass
-
-    finally:
-        controller.remove_listener(listener)
+    # finally:
+    #     controller.remove_listener(listener)
 
 if __name__ == "__main__":
     main()
 
-class SampleListener(Leap.Listener):
+class ContextAwareListener(Leap.Listener):
+
+    def __init__(self, controller=None):
+        self.super().controller = controller
+
+    def __enter__(self):
+        self.controller.add_listener(listener)
+
+
+    def __exit__(self):
+        self.controller.remove_listener(self)
+
 
     def on_connect(self,controller):
         print("Connected..\n\n")
