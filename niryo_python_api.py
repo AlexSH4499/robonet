@@ -1,6 +1,8 @@
 import time
 
 from niryo_one_python_api.niryo_one_api import *
+
+import numpy
 from requests import Session, Request
 import rospy
 
@@ -8,11 +10,12 @@ import rospy
 DEFAULT_ADDRESS = '10.10.10.10'
 class RobotSession:
 
-    def __init__(self, name='', id=0):
+    def __init__(self, name='', id=0, r_ip_address=DEFAULT_ADDRESS):
         rospy.init_node('niryo_one_example_python_api')
         self.niryo = NiryoOne()
         self.name = name
         self.id = id
+        self.r_ip_address = r_ip_address
         self.session = Session()
         print('Commencing calibration...')
         self.niryo.calibrate_auto()
@@ -37,10 +40,27 @@ class RobotSession:
             print("Session Terminated...\n")
         return
 
+    def listen_for_movement(self, src=''):
+        request = requests.get(src, stream=True)#Requests cannot release the connection back to the pool unless you consume all the data or call Response.close.
+
+    def send_movement_robot(self,movement=[]):
+        if movement is None:
+            return None
+        elif len(movement) > 6:
+            raise ValueError()
+        elif len(movement) < 6:
+            while len(movement) < 6:
+                movement.append(0.0)#pad with 0's
+        else:
+            request = requests.post(self.r_ip_address, data=movement)
+
+            return request
+
+
     def init_connection(self, address=DEFAULT_ADDRESS):
         #make a port available for session to listen
         #Open a connection to robot
-        request = self.session.get(address)
+        request = self.session.get(address, verify=False)#ignores SSL certificate
         return
 
     def terminate_connection(self):
@@ -66,7 +86,13 @@ class RobotSession:
 
 import unittest
 
-
-class SessioTest(unittest.TestCase):
+class SessionTest(unittest.TestCase):
 
     def test_robot_connection(self):
+        pass
+
+    def test_robot_movement(self):
+        pass
+
+    def test_calibration(self):
+        pass
