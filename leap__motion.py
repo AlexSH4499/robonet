@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(src_dir, '../leap_python3')))
 # sys.path.append(r"C:\Leap_Motion_Developer_Kit_4.0.0+52173\LeapSDK")
 # sys.path.append(r"C:\Leap_Motion_Developer_Kit_4.0.0+52173\LeapSDK\lib")
 # sys.path.append(r"C:\Leap_Motion_Developer_Kit_4.0.0+52173\LeapSDK\lib\x86")
-from leap_python3 import Leap
+from leap_motion_lib import LeapPython as Leap
 
 
 class ContextAwareListener(Leap.Listener):
@@ -86,7 +86,7 @@ def main():
         print(current_line)
         #while current_line  is None:
         while True:
-            
+
             frame = listener.on_frame(listener.controller)
             print(hand_properties(frame))
             try:
