@@ -3527,16 +3527,16 @@ static swig_module_info swig_module = {swig_types, 46, 0, 0, 0, 0};
 #endif
 
 /*-----------------------------------------------
-              @(target):= LeapPython.so
+              @(target):= _Leap.so
   ------------------------------------------------*/
 #if PY_VERSION_HEX >= 0x03000000
-#  define SWIG_init    PyInit_LeapPython
+#  define SWIG_init    PyInit__Leap
 
 #else
-#  define SWIG_init    initLeapPython
+#  define SWIG_init    init_Leap
 
 #endif
-#define SWIG_name    "LeapPython"
+#define SWIG_name    "_Leap"
 
 #define SWIGVERSION 0x030012 
 #define SWIG_VERSION SWIGVERSION
@@ -5105,7 +5105,7 @@ SWIG_FromCharPtr(const char *cptr)
  * C++ director class methods
  * --------------------------------------------------- */
 
-#include "LeapPython.h"
+#include "Leap_wrap.h"
 
 SwigDirector_Listener::SwigDirector_Listener(PyObject *self): Leap::Listener(), Swig::Director(self) {
   SWIG_DIRECTOR_RGTR((Leap::Listener *)this, this); 

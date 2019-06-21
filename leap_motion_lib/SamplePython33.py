@@ -1,11 +1,17 @@
 ################################################################################
-# Copyright (C) 2012 Leap Motion, Inc. All rights reserved.                    #
-# NOTICE: This developer release of Leap Motion, Inc. software is confidential #
+# Copyright (C) 2012 LeapPython Motion, Inc. All rights reserved.                    #
+# NOTICE: This developer release of LeapPython Motion, Inc. software is confidential #
 # and intended for very limited distribution. Parties using this software must #
 # accept the SDK Agreement prior to obtaining this software and related tools. #
 # This software is subject to copyright.                                       #
 ################################################################################
-import sys
+#import sys
+import os, sys, inspect
+src_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
+#arch_dir = '../lib/x64' if sys.maxsize > 2**32 else '../lib/x86'
+print(src_dir)
+sys.path.insert(0, os.path.abspath(src_dir))
+
 import Leap
 
 class SampleListener(Leap.Listener):
@@ -38,7 +44,7 @@ class SampleListener(Leap.Listener):
             numFingers = len(fingers)
             if numFingers >= 1:
                 # Calculate the hand's average finger tip position
-                pos = Leap.Vector()
+                pos = LeapPython.Vector()
                 for finger in fingers:
                     pos += finger.tip_position
 
@@ -55,9 +61,9 @@ class SampleListener(Leap.Listener):
 
             # Calculate the hand's pitch, roll, and yaw angles
             print("Pitch: %f degrees,  Roll: %f degrees,  Yaw: %f degrees" % (
-                direction.pitch * Leap.RAD_TO_DEG,
-                normal.roll * Leap.RAD_TO_DEG,
-                direction.yaw * Leap.RAD_TO_DEG))
+                direction.pitch * LeapPython.RAD_TO_DEG,
+                normal.roll * LeapPython.RAD_TO_DEG,
+                direction.yaw * LeapPython.RAD_TO_DEG))
 
             print("Hand curvature radius: %f mm" % hand.sphere_radius)
 
