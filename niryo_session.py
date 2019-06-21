@@ -40,6 +40,11 @@ class RobotSession:
             print("Session Terminated...\n")
         return
 
+    def movement_limits(self):
+        restrictions = []# restrictions on (x,y,z) & (pitch, roll, yaw)
+
+        return restrictions
+
     def listen_for_movement(self, src=''):
         request = requests.get(src, stream=True)#Requests cannot release the connection back to the pool unless you consume all the data or call Response.close.
 
@@ -66,7 +71,7 @@ class RobotSession:
     def terminate_connection(self):
         #Destroy NiryoObject
         #terminate HTTP connection to Robot port
-        self. niryo.wait(time=5)#seconds
+        self.niryo.wait(time=5)#seconds
         return
 
     def current_pose(self):

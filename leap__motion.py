@@ -1,23 +1,34 @@
 import os, sys, inspect, _thread, time
+from pathlib import Path, PureWindowsPath
 
+library_dir = PureWindowsPath("leap_motion_lib\\x64")
+corrected_path = Path(library_dir)
 src_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
+print(src_dir)
 # src_dir = os.path.abspath("C:\\Leap_Motion_Developer_Kit_4.0.0+52173\\LeapSDK")
 # # Windows and Linux
 #arch_dir = '../lib/x64' if sys.maxsize > 2**32 else '../lib/x86'
 # # Mac
 # #arch_dir = os.path.abspath(os.path.join(src_dir, '../lib'))
 #sys.path.insert(0, os.path.abspath(os.path.join(src_dir, arch_dir)))
-sys.path.insert(0, os.path.abspath(os.path.join(src_dir, '../leap_python3')))
+# print(os.path.abspath(os.path.join(src_dir, '../leap_motion_lib/x64')) )
+# print(sys.path.insert(0, os.path.abspath(os.path.join(src_dir, '../leap_motion_lib/x64'))) )
 #sys.path.append(r"C:\Leap_Motion_Developer_Kit_4.0.0+52173\LeapSDK\lib\x64")
 # sys.path.append(r"C:\Leap_Motion_Developer_Kit_4.0.0+52173\LeapSDK")
 # sys.path.append(r"C:\Leap_Motion_Developer_Kit_4.0.0+52173\LeapSDK\lib")
 # sys.path.append(r"C:\Leap_Motion_Developer_Kit_4.0.0+52173\LeapSDK\lib\x86")
-from leap_motion_lib import LeapPython as Leap
+abs_path = os.path.join(src_dir,corrected_path)
+print(abs_path)
+#sys.path.append( os.path.abspath(os.path.join(src_dir, r'\leap_motion_lib\x64')))
+
+print(sys.path.append(abs_path))
+import pdb
+pdb.run('import Leap')
 
 
 class ContextAwareListener(Leap.Listener):
 
-    def __init__(self, controller=None):
+    def __init__(self, controller):
         if controller is None:
             raise ValueError("Controller was not properly intialized...")
 
@@ -26,6 +37,7 @@ class ContextAwareListener(Leap.Listener):
 
     def __enter__(self):
         self.controller.add_listener(self)
+        return self
 
     def __exit__(self):
         self.controller.remove_listener(self)
@@ -61,7 +73,7 @@ def hand_properties(frame):
 
 def follow_hand(handID=0, frame=None):
     hand = frame.hand(handID)
-    pass
+    return
 
 def is_previous_frame(curr_frame,prev_id):
     if curr_frame.id == prev_id:
