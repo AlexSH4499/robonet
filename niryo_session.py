@@ -41,7 +41,7 @@ class RobotSession:
         return
 
     def movement_limits(self):
-        restrictions = []# restrictions on (x,y,z) & (pitch, roll, yaw)
+        restrictions = (,)# restrictions on (x,y,z) & (pitch, roll, yaw)
 
         return restrictions
 
@@ -61,6 +61,9 @@ class RobotSession:
 
             return request
 
+    def on_error(self):
+        print(self.robot_status())
+        return
 
     def init_connection(self, address=DEFAULT_ADDRESS):
         #make a port available for session to listen
@@ -88,6 +91,23 @@ class RobotSession:
 
     def debug(self):
         print(self.robot_status())
+
+    def __enter__(self,HTTP_REQ):
+        '''This will receive a request with robot id, name,ip_address, command and data if any.'''
+        try:
+            pass
+        except NiryoOneException as e:
+            self.on_error()
+            print(e)
+        finally:
+            self.terminate_connection()
+            
+        return self
+
+    def __exit__(self):
+        self.terminate_connection()
+
+        return self
 
 import unittest
 
