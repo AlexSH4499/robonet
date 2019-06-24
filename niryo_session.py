@@ -6,6 +6,20 @@ import numpy
 from requests import Session, Request
 import rospy
 
+J1_LOWER_LIM = -3.053#rads
+J2_LOWER_LIM = -1.919
+J3_LOWER_LIM = -1.396
+J4_LOWER_LIM = -3.053
+J5_LOWER_LIM = -1.744
+J6_LOWER_LIM = -2.573
+
+J1_UPPER_LIM = 3.053#rads
+J2_UPPER_LIM = 0.639
+J3_UPPER_LIM = 1.57
+J4_UPPER_LIM = 3.053
+J5_UPPER_LIM = 1.919
+J6_UPPER_LIM = 2.573
+
 #rospy.init_node('niryo_one_example_python_api')
 DEFAULT_ADDRESS = '10.10.10.10'
 class RobotSession:
@@ -80,7 +94,7 @@ class RobotSession:
     def current_pose(self):
         return self.niryo.get_pose()
 
-    def movement(self, joints=[], arm_vel=10):
+    def movement(self, joints=[], arm_vel=100):
         self.niryo.set_max_velocity(arm_vel)
         self.niryo.move_joints(joints)#moves joints to specified position
         #self.niryo.shift_pose(joints)#will take a position relative to current position
@@ -101,7 +115,7 @@ class RobotSession:
             print(e)
         finally:
             self.terminate_connection()
-            
+
         return self
 
     def __exit__(self):
