@@ -3,59 +3,6 @@ from django.db import models
 # Create your models here.
 
 
-class WareHouse(models.Model):
-    class Meta:
-        ordering = ['uid', 'name']
-
-    #manager = models.Manager()
-
-    uid = models.IntegerField(primary_key=True)
-    objects = WareHouseManager(warehouse_id=uid)
-    robots = models.ManyToManyField(Robot)
-    name = models.CharField(max_length=30)
-
-    def add_robot(self, robot):
-        pass
-
-    def remove_robot(self, robot):
-        pass
-
-class WareHouseManager(models.Manager):
-    def __init__(self, warehouse_id=None, *args, **kwargs):
-        self._warehouse_id = warehouse_id
-        super().__init__(*args, **kwargs)
-        return
-
-    def find(self, warehouse_id):
-        queryset = self.get_queryset()
-
-        try:
-            instance = queryset.get(pk=warehouse_id)
-        except ObjectDoesNotExist:
-            instance = None
-
-        finally:
-            return instance
-
-    def find_all_robots(self, warehouse_id :int):
-        queryset = self.get_queryset()
-        return queryset.filter(warehouse_id=warehouse_id)
-
-    def factory_manager_for_warehouse(warehouse_id):
-        return RobotManager.factory(r)
-
-class RobotQuerySet(models.QuerySet):
-
-    def  some_filter(self):
-        return (
-            self.annotate(
-                count_category=Count(
-                    'a__category__idk'
-                )
-            )
-            .filter(count_category_gt=1)
-        )
-
 # The Robot to use in facility
 class Robot(models.Model):
 
@@ -72,8 +19,9 @@ class Robot(models.Model):
     uid = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=20)
     status = models.CharField(max_length=15, choices=STATUS)
-    warehouse_id = models.ForeignKey(model=WareHouse, on_delete=models.CASCADE)#Physicial World Positioning
-    as_warehouse = factory_manager_for_warehouse(warehouse_id)
+    # warehouse_id = models.ForeignKey(WareHouse, on_delete=models.CASCADE)#Physicial World Positioning
+    location = models.CharField(max_length=30)
+    # as_warehouse = factory_manager_for_warehouse(warehouse_id)
 
     def properties():
         return ('uid', 'name', 'status', 'location')
@@ -106,57 +54,122 @@ class Robot(models.Model):
         return props
 
     def __str__(self):
-        return f'{self.uid} | {self.name} | {self.status}  | {self.warehouse_id}'
+        return f'{self.uid} | {self.name} | {self.status}  | {self.location}'
+
+
+class WareHouse(models.Model):
+    class Meta:
+        ordering = ['uid', 'name']
+
+    #manager = models.Manager()
+
+    uid = models.IntegerField(primary_key=True)
+    #objects = WareHouseManager(warehouse_id=uid)
+    robots = models.ManyToManyField(Robot)
+    name = models.CharField(max_length=30)
+
+    def add_robot(self, robot):
+        pass
+
+    def remove_robot(self, robot):
+        pass
+
+#
+# class WareHouseManager(models.Manager):
+#     def __init__(self, warehouse_id=None, *args, **kwargs):
+#         self._warehouse_id = warehouse_id
+#         super().__init__(*args, **kwargs)
+#         return
+#
+#     def find(self, warehouse_id):
+#         queryset = self.get_queryset()
+#
+#         try:
+#             instance = queryset.get(pk=warehouse_id)
+#         except ObjectDoesNotExist:
+#             instance = None
+#
+#         finally:
+#             return instance
+#
+#     def find_all_robots(self, warehouse_id :int):
+#         queryset = self.get_queryset()
+#         return queryset.filter(warehouse_id=warehouse_id)
+#
+#     def factory_manager_for_warehouse(warehouse_id):
+#         return RobotManager.factory(r)
 
 
 
-def factory_manager_for_warehouse(warehouse_id):
-    return RobotManager.factory(model=Robot, warehouse_id=warehouse_id)
-
-from typing import Optional
-
-class RobotManager(models.Manager):
-
-    def __init__(self, warehouse_id=None, *args, **kwargs):
-        self._warehouse_id = warehouse_id
-        super().__init__(*args, **kwargs)
-
-
-    def __str__(self):
-
-        return
-
-    def get_queryset(self):
-        queryset = RobotQuerySet(
-            model = self.model,
-            using = self._db,
-            hints=self._hints
-        )
-
-        if self._warehouse_id is not None:
-            queryset = queryset.filter(warehouse_id=self._warehouse_id)
-
-        return queryset
 
 
 
-    @classmethod
-    def factory(cls, model, warehouse_id=None):
-        manager=cls(warehouse_id)
-        manager.model = model
-        return manager
 
-    def find(self, robot_id):
-        queryset = self.get_queryset()
 
-        try:
-            instance = queryset.get(pk=robot_id)
-        except ObjectDoesNotExist:
-            instance = None
 
-        finally:
-            return instance
 
-    def find_all_with_warehouse(self, warehouse_id :int):
-        queryset = self.get_queryset()
-        return queryset.filter(location=warehouse_id)
+#
+# class RobotQuerySet(models.QuerySet):
+#
+#     def  some_filter(self):
+#         return (
+#             self.annotate(
+#                 count_category=Count(
+#                     'a__category__idk'
+#                 )
+#             )
+#             .filter(count_category_gt=1)
+#         )
+#
+#
+#
+# def factory_manager_for_warehouse(warehouse_id):
+#     return RobotManager.factory(model=Robot, warehouse_id=warehouse_id)
+#
+# from typing import Optional
+#
+# class RobotManager(models.Manager):
+#
+#     def __init__(self, warehouse_id=None, *args, **kwargs):
+#         self._warehouse_id = warehouse_id
+#         super().__init__(*args, **kwargs)
+#
+#
+#     def __str__(self):
+#
+#         return
+#
+#     def get_queryset(self):
+#         queryset = RobotQuerySet(
+#             model = self.model,
+#             using = self._db,
+#             hints=self._hints
+#         )
+#
+#         if self._warehouse_id is not None:
+#             queryset = queryset.filter(warehouse_id=self._warehouse_id)
+#
+#         return queryset
+#
+#
+#
+#     @classmethod
+#     def factory(cls, model, warehouse_id=None):
+#         manager=cls(warehouse_id)
+#         manager.model = model
+#         return manager
+#
+#     def find(self, robot_id):
+#         queryset = self.get_queryset()
+#
+#         try:
+#             instance = queryset.get(pk=robot_id)
+#         except ObjectDoesNotExist:
+#             instance = None
+#
+#         finally:
+#             return instance
+#
+#     def find_all_with_warehouse(self, warehouse_id :int):
+#         queryset = self.get_queryset()
+#         return queryset.filter(location=warehouse_id)

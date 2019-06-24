@@ -12,25 +12,25 @@ from roboIF.serializers import *
 from roboIF.models import Robot, WareHouse
 
 #/robots
-# class RobotList(APIView):
-#
-#     def get(self, request):
-#         robs = Robot.objects.all()
-#         #serializer = RobotSerializer(robs, many=True)
-#         serializer = RobotSerializer
-#         return Response(serializer.data)
+class RobotList(APIView):
+
+    def get(self, request):
+        robs = Robot.objects.all()
+        #serializer = RobotSerializer(robs, many=True)
+        serializer = RobotSerializer
+        return Response(serializer.data)
 
 class RobotView(viewsets.ModelViewSet):
     queryset = Robot.objects.all()
     serializer_class = RobotSerializer
-    # 
-    # @action(methods=['put'], detail=True, permission_classes=[IsAdminOrIsSelf])
-    # def set_status(self,request, pk=None):
-    #     if pk is None:
-    #         msg ="Error Invalid private key"
-    #         return HtttpResponse(msg, status_code=404)
     #
-    #     robot = queryset.filter
+    @action(methods=['put'], detail=True)#@action(methods=['put'], detail=True, permission_classes=[IsAdminOrIsSelf]
+    def set_status(self,request, pk=None):
+        if pk is None:
+            msg ="Error Invalid private key"
+            return HtttpResponse(msg, status_code=404)
+
+        robot = queryset.filter
     #permissions_classes = (permissions.IsAuthenticatedOrReadOnly)
 
 class WareHouseView(viewsets.ModelViewSet):
