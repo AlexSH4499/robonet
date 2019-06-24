@@ -5,6 +5,7 @@ from niryo_one_python_api.niryo_one_api import *
 import numpy
 from requests import Session, Request
 import rospy
+import json
 
 J1_LOWER_LIM = -3.053#rads
 J2_LOWER_LIM = -1.919
@@ -24,13 +25,19 @@ J6_UPPER_LIM = 2.573
 DEFAULT_ADDRESS = '10.10.10.10'
 class RobotSession:
 
-    def __init__(self, name='', id=0, r_ip_address=DEFAULT_ADDRESS):
-        rospy.init_node('niryo_one_example_python_api')
-        self.niryo = NiryoOne()
+    def __init__(self,HTTP_REQ=None, name='', id=0, r_ip_address=DEFAULT_ADDRESS):
+        try:
+            rospy.init_node('niryo_one_example_python_api')
+            self.niryo = NiryoOne()
+        except NiryoOneException as e:
+            print("Could not establish connection to Niryo Robot!\n")
+            print(e)
+
         self.name = name
         self.id = id
         self.r_ip_address = r_ip_address
-        self.session = Session()
+        self.request = HTTP_REQ
+        #self.session = Session()
         print('Commencing calibration...')
         self.niryo.calibrate_auto()
         print('Calibration Finished\n\n')
@@ -120,6 +127,7 @@ class RobotSession:
 
     def __exit__(self):
         self.terminate_connection()
+        self.request = None
 
         return self
 
