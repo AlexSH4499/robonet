@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from django.urls import path, include
-# from views import RobotList, RobotView
+#from views import RobotList, RobotView
 from roboIF import views
 from rest_framework import routers
 from rest_framework.urlpatterns import  format_suffix_patterns

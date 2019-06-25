@@ -48,8 +48,7 @@ class Robot(models.Model):
     #
     #     return self.manager().filter(uid=id)
 
-    def create_robot(id, name, stat, loc):
-        return Robot(uid=id, name=name, status=stat, warehouse_id=loc)
+
 
     def filterable_props(self):#dict of all obj properties
         props = {k:v for k,v in self.__dict__ if k in properties()}
@@ -90,6 +89,7 @@ class MovementRequest(models.Model):
     joint_4 = models.DecimalField(max_digits=6, decimal_places=2)
     joint_5 = models.DecimalField(max_digits=6, decimal_places=2)
     joint_6 = models.DecimalField(max_digits=6, decimal_places=2)
+
 
 
 
