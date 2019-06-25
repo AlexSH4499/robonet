@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-
+from django.views.generic.edit import CreateView, UpdateView,DeleteView
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
@@ -14,36 +14,58 @@ from roboIF.serializers import *
 from roboIF.models import Robot, WareHouse
 
 #/robots
-class RobotList(APIView):
+# class RobotList(APIView):
 
-    def get(self, request):
-        robs = Robot.objects.all()
-        #serializer = RobotSerializer(robs, many=True)
-        serializer = RobotSerializer
-        return Response(serializer.data)
+    # def get(self, request):
+    #     robs = Robot.objects.all()
+    #     #serializer = RobotSerializer(robs, many=True)
+    #     serializer = RobotSerializer
+    #     return Response(serializer.data)
 
+# / robots
 class RobotView(viewsets.ModelViewSet):
     queryset = Robot.objects.all()
     serializer_class = RobotSerializer
-    #
+    
     @action(methods=['put'], detail=True)#@action(methods=['put'], detail=True, permission_classes=[IsAdminOrIsSelf]
     def set_status(self,request, pk=None):
         if pk is None:
             msg ="Error Invalid private key"
             return HtttpResponse(msg, status_code=404)
 
-        robot = queryset.filter
+        robot = queryset.filter(pk)
     #permissions_classes = (permissions.IsAuthenticatedOrReadOnly)
 
+#/warehouses
 class WareHouseView(viewsets.ModelViewSet):
     queryset = WareHouse.objects.all()
     serializer_class = WareHouseSerializer
     #permissions_classes = (permissions.IsAuthenticatedOrReadOnly)
 
+#requests
 class RequestsView(viewsets.ModelViewSet):
 
     queryset = MovementRequest.objects.all()
     serializer_class = RequestSerializer
+
+
+    @action(detail=True, methods=['post'])
+    def create_request(self, request, pk=None):
+
+        return
+
+    def retrieve(self, request, pk):
+        queryset = MovementRequest.objects.all()
+        rq = get_object_or_404(queryset,pk=pk)
+        serializer = RequestSerializer(rq)
+
+        return Response(serializer.data)
+
+class RequestsCreate(viewsets.ModelViewSet):
+    model = MovementRequest
+    fields = ['uid', 'robot_to_send','joint_1',
+                'joint_2','joint_3','joint_4',
+                'joint_5','joint_6']
 
 def list_models(model, uid):
     try:

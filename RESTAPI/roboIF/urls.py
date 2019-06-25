@@ -10,6 +10,7 @@ router = routers.DefaultRouter()
 router.register(r'robots', views.RobotView)
 router.register(r'warehouses', views.WareHouseView)
 router.register(r'requests',views.RequestsView)
+# router.register(r'robots/add/$',views.RequestsCreate)
 
 urlpatterns = [
     #path(r'/robots', RobotList.as_view()),
