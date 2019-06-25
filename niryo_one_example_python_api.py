@@ -1,4 +1,5 @@
 #/usr/bin/env python
+
 from niryo_one_python_api.niryo_one_api import *
 import rospy
 import time

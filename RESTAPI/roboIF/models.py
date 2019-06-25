@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from django.db import models
+# from django.core.urlresolver import reverse
 #https://medium.com/@jairvercosa/manger-vs-query-sets-in-django-e9af7ed744e0
 # Create your models here.
 
@@ -54,6 +55,9 @@ class Robot(models.Model):
         props = {k:v for k,v in self.__dict__ if k in properties()}
         return props
 
+    # def get_absolute_url(self):
+    #     return reverse('robot:detail', kwargs={'pk':self.pk})
+
     def __str__(self):
         return f'{self.uid} | {self.name} | {self.status}  | {self.location}'
 
@@ -75,6 +79,10 @@ class WareHouse(models.Model):
     def remove_robot(self, robot):
         pass
 
+    def __str__(self):
+
+        return f'{self.name} | # Robots:{self.robots}'
+
 class MovementRequest(models.Model):
     class Meta:
         ordering =['uid', 'robot_to_send']
@@ -90,6 +98,8 @@ class MovementRequest(models.Model):
     joint_5 = models.DecimalField(max_digits=6, decimal_places=2)
     joint_6 = models.DecimalField(max_digits=6, decimal_places=2)
 
+    def __str__(self):
+        return f'Request [{self.uid}] | target: {self.robot_to_send.name}'
 
 
 

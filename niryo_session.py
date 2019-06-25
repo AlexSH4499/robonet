@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import time
 
 from niryo_one_python_api.niryo_one_api import *

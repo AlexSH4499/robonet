@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os, sys, inspect, _thread, time
 from pathlib import Path, PureWindowsPath
 
