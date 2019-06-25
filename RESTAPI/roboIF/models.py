@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from django.db import models
 #https://medium.com/@jairvercosa/manger-vs-query-sets-in-django-e9af7ed744e0
 # Create your models here.
@@ -63,7 +65,7 @@ class WareHouse(models.Model):
 
     #manager = models.Manager()
 
-    uid = models.IntegerField(primary_key=True)
+    uid = models.IntegerField(primary_key=True,default= 0)
     #objects = WareHouseManager(warehouse_id=uid)
     robots = models.ManyToManyField(Robot)
     name = models.CharField(max_length=30)
@@ -73,6 +75,24 @@ class WareHouse(models.Model):
 
     def remove_robot(self, robot):
         pass
+
+class MovementRequest(models.Model):
+    class Meta:
+        ordering =['uid', 'robot_to_send']
+
+    uid = models.IntegerField(primary_key=True)
+    robot_to_send = models.ForeignKey(Robot, on_delete=models.CASCADE)
+
+    joint_1 = models.DecimalField(max_digits=6, decimal_places=2)
+    joint_2 = models.DecimalField(max_digits=6, decimal_places=2)
+    joint_3 = models.DecimalField(max_digits=6, decimal_places=2)
+
+    joint_4 = models.DecimalField(max_digits=6, decimal_places=2)
+    joint_5 = models.DecimalField(max_digits=6, decimal_places=2)
+    joint_6 = models.DecimalField(max_digits=6, decimal_places=2)
+
+
+
 
 #
 # class WareHouseManager(models.Manager):

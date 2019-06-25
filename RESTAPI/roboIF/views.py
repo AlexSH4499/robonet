@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
@@ -37,6 +39,11 @@ class WareHouseView(viewsets.ModelViewSet):
     queryset = WareHouse.objects.all()
     serializer_class = WareHouseSerializer
     #permissions_classes = (permissions.IsAuthenticatedOrReadOnly)
+
+class RequestsView(viewsets.ModelViewSet):
+
+    queryset = MovementRequest.objects.all()
+    serializer_class = RequestSerializer
 
 def list_models(model, uid):
     try:
