@@ -1,0 +1,2 @@
+ git filter-branch --force --index-filter "git rm --cached --ignore-unmatch environments\django_backend" --prune-empty --tag-name-filter cat -- --all
+ 
