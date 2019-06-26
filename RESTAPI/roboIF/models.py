@@ -5,12 +5,12 @@ from django.db import models
 #https://medium.com/@jairvercosa/manger-vs-query-sets-in-django-e9af7ed744e0
 # Create your models here.
 
-DEFAULT_ADDRESS = '192.164.1.42'
+
 # The Robot to use in facility
 class Robot(models.Model):
 
     class Meta:
-        ordering = ['uid', 'name']
+        ordering = ['uid']
     STATUS = (
         ('OFF','OFFLINE'),
         ('ON','ONLINE'),
@@ -24,11 +24,10 @@ class Robot(models.Model):
     status = models.CharField(max_length=15, choices=STATUS)
     # warehouse_id = models.ForeignKey(WareHouse, on_delete=models.CASCADE)#Physicial World Positioning
     location = models.CharField(max_length=30)
-    ip_address = models.CharField(max_length=15, default=DEFAULT_ADDRESS)
     # as_warehouse = factory_manager_for_warehouse(warehouse_id)
 
     def properties():
-        return ('uid', 'name', 'status', 'location','ip_address')
+        return ('uid', 'name', 'status', 'location')
     # @property
     # def status(self):
     #     return self.status
