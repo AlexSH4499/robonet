@@ -7,7 +7,7 @@ class RobotSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Robot
-        fields = ('uid', 'name','status', 'location')
+        fields = ('uid', 'name','status', 'location','ip_address')
 
 class WareHouseSerializer(serializers.ModelSerializer):
 

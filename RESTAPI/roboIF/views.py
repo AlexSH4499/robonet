@@ -26,7 +26,7 @@ from roboIF.models import Robot, WareHouse
 class RobotView(viewsets.ModelViewSet):
     queryset = Robot.objects.all()
     serializer_class = RobotSerializer
-    
+
     @action(methods=['put'], detail=True)#@action(methods=['put'], detail=True, permission_classes=[IsAdminOrIsSelf]
     def set_status(self,request, pk=None):
         if pk is None:
@@ -34,6 +34,9 @@ class RobotView(viewsets.ModelViewSet):
             return HtttpResponse(msg, status_code=404)
 
         robot = queryset.filter(pk)
+
+
+
     #permissions_classes = (permissions.IsAuthenticatedOrReadOnly)
 
 #/warehouses
@@ -46,15 +49,33 @@ class WareHouseView(viewsets.ModelViewSet):
 class RequestsView(viewsets.ModelViewSet):
 
     queryset = MovementRequest.objects.all()
-    serializer_class = RequestSerializer
+    serializer_class = RequestSerializer#many is when we want to store a bunch at once
 
+    @action(methods=['post'], detail=True)
+    def post(self,request):
+        form = MovementRequestForm(request.POST)
 
-    @action(detail=True, methods=['post'])
-    def create_request(self, request, pk=None):
+        if form.is_valid():
+            form.save()
+            text = form.cleaned_data['post']
+    # @action(detail=True, methods=['post'])
+    # def create_request(self, request, pk=None):
+    #
+    #     return
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data,many=isinstance(request.data,list))
+        serializer.is_valid(raise_exception=True)
 
-        return
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def retrieve(self, request, pk):
+        if pk is None:
+            queryset = MovementRequest.objects.all()
+            serializer = RequestSerializer(queryset, many=True)
+            return Response(serializer.data)
+
         queryset = MovementRequest.objects.all()
         rq = get_object_or_404(queryset,pk=pk)
         serializer = RequestSerializer(rq)
