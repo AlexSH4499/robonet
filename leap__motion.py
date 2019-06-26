@@ -3,6 +3,7 @@
 import os, sys, inspect, _thread, time
 from pathlib import Path, PureWindowsPath
 
+
 library_dir = PureWindowsPath("leap_motion_lib\\x64")
 corrected_path = Path(library_dir)
 src_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
@@ -25,7 +26,7 @@ print(abs_path)
 
 print(sys.path.append(abs_path))
 import pdb
-pdb.run('import Leap')
+
 
 
 class ContextAwareListener(Leap.Listener):
@@ -63,7 +64,7 @@ class ContextAwareListener(Leap.Listener):
 def hand_properties(frame):
     hand = frame.hands.rightmost
 
-    position = hand.palm_position #(x,y,z) in millimeters
+    position = hand.palm_position #(x,y,z) in millimeters -> This doesn't work, tuple unpacking is broken in API
     velocity = hand.palm_velocity
     normal_vector = hand.palm_normal
 
