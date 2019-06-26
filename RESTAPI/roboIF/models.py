@@ -86,10 +86,11 @@ class WareHouse(models.Model):
 
 class MovementRequest(models.Model):
     class Meta:
-        ordering =['uid', 'robot_to_send']
+        ordering =['uid', 'robot_to_send','executed']
 
     uid = models.IntegerField(primary_key=True)
     robot_to_send = models.ForeignKey(Robot, on_delete=models.CASCADE)
+    executed = models.BooleanField(default=False)
 
     joint_1 = models.DecimalField(max_digits=6, decimal_places=2)
     joint_2 = models.DecimalField(max_digits=6, decimal_places=2)
@@ -100,7 +101,7 @@ class MovementRequest(models.Model):
     joint_6 = models.DecimalField(max_digits=6, decimal_places=2)
 
     def __str__(self):
-        return f'Request [{self.uid}] | target: {self.robot_to_send.name}'
+        return f'Request [{self.uid}] | target: {self.robot_to_send.name} | Executed:[{self.executed}]'
 
 
 

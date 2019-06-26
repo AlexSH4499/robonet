@@ -82,12 +82,6 @@ class RequestsView(viewsets.ModelViewSet):
 
         return Response(serializer.data)
 
-class RequestsCreate(viewsets.ModelViewSet):
-    model = MovementRequest
-    fields = ['uid', 'robot_to_send','joint_1',
-                'joint_2','joint_3','joint_4',
-                'joint_5','joint_6']
-
 def list_models(model, uid):
     try:
         return model.objects.get(uid=uid)
