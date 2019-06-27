@@ -51,18 +51,27 @@ class RequestsView(viewsets.ModelViewSet):
     queryset = MovementRequest.objects.all()
     serializer_class = RequestSerializer#many is when we want to store a bunch at once
 
-    @action(methods=['post'], detail=True)
-    def post(self,request):
-        form = MovementRequestForm(request.POST)
-
-        if form.is_valid():
-            form.save()
-            text = form.cleaned_data['post']
+    # @action(methods=['post'], detail=True)
+    # def post(self,request,pk):
+    #     form = MovementRequestForm(request.POST)
+    #
+    #     if form.is_valid():
+    #         form.save()
+    #         text = form.cleaned_data['post']
     # @action(detail=True, methods=['post'])
     # def create_request(self, request, pk=None):
     #
     #     return
-    def create(self, request, *args, **kwargs):
+
+    def post(self, request,pk):
+        serializer = RequestSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def create(self, request, pk,*args, **kwargs):
         serializer = self.get_serializer(data=request.data,many=isinstance(request.data,list))
         serializer.is_valid(raise_exception=True)
 

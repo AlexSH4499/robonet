@@ -15,6 +15,23 @@ from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 
 FRAME_BUFFER_LIM = 60
 
+class HandFrame:
+
+    def __init__(self, x,y,z,pitch, yaw,roll):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.pitch = pitch
+        self.yaw = yaw
+        self.roll = roll
+        return self
+
+    def __str__(self):
+        vars = [(k,v) for k,v in self.__dict__]
+        return list(vars)
+
+    def __len__(self):
+        return 1
 
 class CustomListener(Leap.Listener):
 
@@ -51,7 +68,7 @@ class CustomListener(Leap.Listener):
         avg = self.averaged_position(self.buffer)
 
         if len(self.buffer) >= FRAME_BUFFER_LIM:
-            with open("BUFFERED.txt","w") as f:
+            with open("BUFFERED.txt","a+") as f:
                 st = str(avg) + '\n'
                 f.write(st)
             while len(self.buffer) > 0:
@@ -79,7 +96,7 @@ class CustomListener(Leap.Listener):
     def on_frame(self, controller):
         start = time.time()
         frame = controller.frame()
-        hand_properties = []
+        hand_props = []
         if(len(frame.hands)!=0 and len(frame.hands)!=2):
             # Get the most recent frame and report some basic information
             #print "Frame id: %d, timestamp: %d, hands: %d, fingers: %d, tools: %d, gestures: %d" % (
@@ -93,12 +110,12 @@ class CustomListener(Leap.Listener):
                 # print(len(hand.palm_position))
 
 
-                hand_properties.append(x)
-                hand_properties.append(y)
-                hand_properties.append(z)
-                hand_properties.append(pitch* Leap.RAD_TO_DEG)# x rotation degrees
-                hand_properties.append(yaw* Leap.RAD_TO_DEG)#y rotation degrees
-                hand_properties.append(roll* Leap.RAD_TO_DEG)# z rotation degrees
+                hand_props.append(x)
+                hand_props.append(y)
+                hand_props.append(z)
+                hand_props.append(pitch* Leap.RAD_TO_DEG)# x rotation degrees
+                hand_props.append(yaw* Leap.RAD_TO_DEG)#y rotation degrees
+                hand_props.append(roll* Leap.RAD_TO_DEG)# z rotation degrees
                 #print(hand_properties)
 
                 MIN_SPEED=20.0
@@ -196,11 +213,11 @@ class CustomListener(Leap.Listener):
                     #print(motor1)
 
             # print "%f seconds" % (time.time() - start)
-            averaged_position = self.frame_buffer(tuple(hand_properties))
+            averaged_position = self.frame_buffer(tuple(hand_props))
 
             #Empty out the props for next frame
-            while len(hand_properties):
-                hand_properties.pop()
+            while len(hand_props):
+                hand_props.pop()
 
         # we need to create a buffere here to limit how many requests are made
 

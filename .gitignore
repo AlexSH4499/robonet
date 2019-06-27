@@ -3,3 +3,12 @@ leap_motion_lib\
 leap_python3\
 model\
 data\
+lib\
+Sample.cpp
+Sample.cs
+Sample.java
+SampleVS2008.sln
+SampleVS2008.vcproj
+SampleVS2010.sln
+SampleVS2012.sln
+SampleVS2012.vcxproj
