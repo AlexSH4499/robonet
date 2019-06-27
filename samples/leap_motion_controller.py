@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 import sys,os,inspect
 
+print(sys.path.insert(0,'C:\\LeapDeveloperKit_2.3.1+31549_win\\LeapSDK\\lib\\x64'))
 
-sys.path.insert(0,'C:\\Leap_Motion_Developer_Kit_4.0.0+52173\\LeapSDK\\lib')
+#print(sys.path.insert(0,'C:\\Leap_Motion_Developer_Kit_4.0.0+52173\\LeapSDK\\lib'))
+print(sys.path.insert(0,'C:\\LeapDeveloperKit_2.3.1+31549_win\\LeapSDK\\lib'))
 #sys.path.insert(0,'C:\\Users\\Test User\\Downloads\\Leap_Motion_SDK_Windows_2.3.1\\LeapDeveloperKit_2.3.1+31549_win\\LeapSDK\\lib')
 src_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
+print(src_dir)
 arch_dir = '../lib/x64'
 sys.path.insert(0, os.path.abspath(os.path.join(src_dir, arch_dir)))
 import Leap, time
@@ -16,7 +19,7 @@ FRAME_BUFFER_LIM = 60
 class CustomListener(Leap.Listener):
 
     def __init__(self):
-        super(SampleListener, self).__init__()
+        super(CustomListener, self).__init__()
         self.buffer = []
         return
 
@@ -241,7 +244,7 @@ def hand_properties(frame):
     # return position, pitch, yaw, roll
     return x, y, z, pitch, yaw, roll
 
-    
+
 def main():
 
     # Create a sample listener and controller
