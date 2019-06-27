@@ -12,6 +12,7 @@ arch_dir = '../lib/x64'
 sys.path.insert(0, os.path.abspath(os.path.join(src_dir, arch_dir)))
 import Leap, time
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
+from LeapResponse import send_response
 
 FRAME_BUFFER_LIM = 60
 
@@ -32,10 +33,11 @@ class HandFrame:
 
     def __len__(self):
         return 1
-
+params = [ "uid","robot_to_send","executed",'joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
 class CustomListener(Leap.Listener):
 
     def __init__(self):
+        self.i = 11
         super(CustomListener, self).__init__()
         self.buffer = []
         return
@@ -46,7 +48,7 @@ class CustomListener(Leap.Listener):
 
     def averaged_position(self, frame_list):
         _x,_y,_z,_pitch,_roll,_yaw = 0, 0, 0, 0, 0, 0
-        print(frame_list)
+        # print(frame_list)
         for x,y,z,pitch,roll,yaw in frame_list:
             _x += x
             _y += y
@@ -65,12 +67,21 @@ class CustomListener(Leap.Listener):
         return _x,_y,_z,_pitch,_roll,_yaw
 
     def frame_buffer(self,frame):
-        avg = self.averaged_position(self.buffer)
+        position = self.averaged_position(self.buffer)
+        values = [self.i , 1 , False]
 
+        for val in position:
+            values.append(round(val,2))
         if len(self.buffer) >= FRAME_BUFFER_LIM:
-            with open("BUFFERED.txt","a+") as f:
-                st = str(avg) + '\n'
-                f.write(st)
+            print("Entered The BUFFER LOGiC\n\n\n")
+            # with open("BUFFERED.txt","a+") as f:
+            #     st = str(avg) + '\n'
+            #     f.write(st)
+            resp = send_response(uid=self.i, data=zip(params, values ))
+            print(resp.json)
+            # print(resp.headers)
+            print('\n\n\n\n\n')
+            self.i = self.i + 1
             while len(self.buffer) > 0:
                 self.buffer.pop()
 
@@ -192,16 +203,16 @@ class CustomListener(Leap.Listener):
 
 
 
-                # Get the hand's sphere radius and palm position
-                print("Hand sphere radius: %f mm, palm position: %s" % (
-                      hand.sphere_radius, hand.palm_position))
+                # # Get the hand's sphere radius and palm position
+                # print("Hand sphere radius: %f mm, palm position: %s" % (
+                #       hand.sphere_radius, hand.palm_position))
 
                 # Get the hand's normal vector and direction
                 normal = hand.palm_normal
                 direction = hand.direction
 
                 # Calculate the hand's pitch
-                print("Hand pitch: %f degrees" % (direction.pitch * Leap.RAD_TO_DEG)) #-20 to 20, ignore -10 to 10
+                # print("Hand pitch: %f degrees" % (direction.pitch * Leap.RAD_TO_DEG)) #-20 to 20, ignore -10 to 10
                 hand_pitch = direction.pitch * Leap.RAD_TO_DEG
                 if (hand_pitch > 10) and (hand_pitch) < 25:
                     motor1 = "1%f\n" % (0.4) #////////////////////////////////////////////////////////// WRIST UP

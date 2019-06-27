@@ -25,17 +25,16 @@ def receive_response():
 
 
 def send_response(uid=0, data={}):
-
     #req = requests.post(API_ADDRESS+f'/{uid}'+'/post/' , auth=('mec123','mec123'), json=data)
-
-    req = requests.post(API_ADDRESS+f'/{uid}'+'/' , auth=('mec123','mec123'), json=data)
-    print(req.url)
-    print(req.data)
-    print(req.json  )
+    req = requests.post(API_ADDRESS+str(uid)+'/' , auth=('mec123','mec123'), json=data)
+    # print(req.url)
+    # print(req.data)
+    # print(req.json  )
     return req
 
 def main():
-    #send_response(uid=10,data=dummy_data())
-    print(receive_response().text)
+    send_response(uid=10,data=dummy_data())
+    #print(receive_response())
+
 if __name__ == "__main__":
     main()
