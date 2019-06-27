@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sys,os,inspect
-
+from collections import OrderedDict
 print(sys.path.insert(0,'C:\\LeapDeveloperKit_2.3.1+31549_win\\LeapSDK\\lib\\x64'))
 
 #print(sys.path.insert(0,'C:\\Leap_Motion_Developer_Kit_4.0.0+52173\\LeapSDK\\lib'))
@@ -71,13 +71,14 @@ class CustomListener(Leap.Listener):
         values = [self.i , 1 , False]
 
         for val in position:
-            values.append(round(val,2))
+            values.append(str(round(val,2)))
+        data = OrderedDict(zip(params,values))
         if len(self.buffer) >= FRAME_BUFFER_LIM:
             print("Entered The BUFFER LOGiC\n\n\n")
             # with open("BUFFERED.txt","a+") as f:
             #     st = str(avg) + '\n'
             #     f.write(st)
-            resp = send_response(uid=self.i, data=zip(params, values ))
+            resp = send_response(uid=self.i, data=data)
             print(resp.json)
             # print(resp.headers)
             print('\n\n\n\n\n')
