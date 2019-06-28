@@ -27,7 +27,7 @@ SECRET_KEY = 't&*bd_d)3g=ge^as(2p2n+4x3a*8uosc!-^)!ar3byt*3@@ot%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.21']#Setup django server at this ip with port 8000
 
 CORS_ORIGIN_ALLOW_ALL = True
 # Application definition

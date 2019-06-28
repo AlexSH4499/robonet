@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import sys,os,inspect
 from collections import OrderedDict
+
 print(sys.path.insert(0,'C:\\LeapDeveloperKit_2.3.1+31549_win\\LeapSDK\\lib\\x64'))
 
 #print(sys.path.insert(0,'C:\\Leap_Motion_Developer_Kit_4.0.0+52173\\LeapSDK\\lib'))
@@ -33,6 +34,7 @@ class HandFrame:
 
     def __len__(self):
         return 1
+
 params = [ "uid","robot_to_send","executed",'joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
 class CustomListener(Leap.Listener):
 
