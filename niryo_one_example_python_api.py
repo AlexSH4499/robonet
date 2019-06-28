@@ -45,6 +45,17 @@ def extract_movement(data={}):
         movement.append(joint)
     return movement
 
+
+def movements(json_data=[]):
+    moves = []
+    for entry in  json_data:
+        moves.append(extract_movement(data=entry))
+
+    for move in moves:
+        print(move)
+    print('\n\n')
+    return moves
+
 def dummy_movement():
     return [0.2,0,0.15,0,0,0]
 
@@ -70,14 +81,28 @@ def debugging():
         print(entry)
     print('\n\n')
 
-    movements = []
-    for entry in  json_data:
-        movements.append(extract_movement(data=entry))
+    moves = movements(json_data=json_data)
 
-    for move in movements:
-        print(move)
-    print('\n\n')
+    rospy.init_node('niryo_one_example_python_api')
+    try:
+        n = NiryoOne()
 
+        n.set_arm_max_velocity(100)
+        # move =moves[0]
+        # print(move)
+        for move in moves:
+            print(move)
+            #n.move_pose(move)
+            n.move_joints(move)
+            time.sleep(1)
+
+
+
+    except NiryoOneException as e:
+        print(e)
+
+    finally:
+        print("Niryo Session Terminated\n")
     return
 
 if __name__ == "__main__":
