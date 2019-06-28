@@ -24,6 +24,11 @@ def open_connection_to_API():
 def cleanse_data(req):
     data = req.json()
     print(data)
+
+    for entry in data:
+        entry.pop('uid')
+        entry.pop('executed')
+        entry.pop('robot_to_send')
     return data
 
 def dummy_movement():
