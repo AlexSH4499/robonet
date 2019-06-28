@@ -18,18 +18,32 @@ def open_connection_to_API():
     session = requests.Session()
     session.verify = True
     req = session.get(API_ROOT)
-    print(req.text)
+    # print(req.text)
     return req
 
 def cleanse_data(req):
     data = req.json()
     print(data)
-
+    print('\n\n')
     for entry in data:
         entry.pop('uid')
         entry.pop('executed')
         entry.pop('robot_to_send')
     return data
+
+limit = 0.3#placeholder limit
+def extract_movement(data={}):
+    movement = []
+    print(type(data))
+    #for k, v in data: error in Python 2, only works in 3
+    for m in data.itervalues():
+        joint = float(m)
+        if joint > limit:
+            joint = limit
+        if joint < -limit:
+            joint = -limit
+        movement.append(joint)
+    return movement
 
 def dummy_movement():
     return [0.2,0,0.15,0,0,0]
@@ -54,6 +68,15 @@ def debugging():
     json_data = cleanse_data(open_connection_to_API())
     for entry in  json_data:
         print(entry)
+    print('\n\n')
+
+    movements = []
+    for entry in  json_data:
+        movements.append(extract_movement(data=entry))
+
+    for move in movements:
+        print(move)
+    print('\n\n')
 
     return
 
