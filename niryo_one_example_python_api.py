@@ -34,14 +34,10 @@ def cleanse_data(req):
 limit = 0.3#placeholder limit
 def extract_movement(data={}):
     movement = []
-    print(type(data))
+    # print(type(data))
     #for k, v in data: error in Python 2, only works in 3
-    for m in data.itervalues():
-        joint = float(m)
-        if joint > limit:
-            joint = limit
-        if joint < -limit:
-            joint = -limit
+    for k,v in sorted(data.iteritems()):
+        joint = float(v)
         movement.append(joint)
     return movement
 
@@ -76,38 +72,51 @@ def main():
     return
 
 def debugging():
-    original_data = open_connection_to_API()
-    json_data = cleanse_data(original_data)
-    for entry in  json_data:
-        print(entry)
-    print('\n\n')
-
-    moves = movements(json_data=json_data)
-
-    rospy.init_node('niryo_one_example_python_api')
     try:
+        rospy.init_node('niryo_one_example_python_api')
         n = NiryoOne()
+        while True:
+            original_data = open_connection_to_API()
+            json_data = cleanse_data(original_data)
+            print('Original data: %s'%original_data)
+            print('\n')
+            print('Json data: %s'%json_data)
+            print('\n')
+            for entry in  json_data:
+                print(entry)
+            print('\n\n')
 
-        n.set_arm_max_velocity(100)
-        # move =moves[0]
-        # print(move)
-        for move in moves:
-            print(move)
-            #n.move_pose(move)
-            n.move_joints(move)
-            #PUT executed = true in the database
-            time.sleep(1)
+            moves = movements(json_data=json_data)
+
+            if len(moves) <= 0 :
+                time.sleep(.500)
+                continue
+
+            try:
+
+
+                n.set_arm_max_velocity(100)
+                # move =moves[0]
+                # print(move)
+                for move in moves:
+                    print(move)
+                    #n.move_pose(move)
+                    n.move_joints(move)
+                    #PUT executed = true in the database
+                    time.sleep(1)
 
 
 
-    except NiryoOneException as e:
-        print(e)
+            except NiryoOneException as e:
+                print(e)
 
-    finally:
-        for data in original_data.json():
-            data['executed'] = True
-            requests.put(API_ROOT + str(data['uid']) + '/', data=data,auth=('mec123','mec123'))
-        print("Niryo Session Terminated\n")
+            finally:
+                for data in original_data.json():
+                    data['executed'] = True
+                    requests.put(API_ROOT + str(data['uid']) + '/', data=data,auth=('mec123','mec123'))
+            time.sleep(.500)
+    except KeyboardInterrupt:
+        print("Niryo Session Terminated\n\n")
     return
 
 if __name__ == "__main__":

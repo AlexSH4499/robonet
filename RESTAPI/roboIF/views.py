@@ -49,6 +49,7 @@ class WareHouseView(viewsets.ModelViewSet):
 class RequestsView(viewsets.ModelViewSet):
 
     queryset = MovementRequest.objects.all()
+    executed_reqs = queryset.filter(executed=True).delete()#we delete the ones that have been processed already
     serializer_class = RequestSerializer#many is when we want to store a bunch at once
 
     # @action(methods=['post'], detail=True)

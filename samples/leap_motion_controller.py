@@ -17,7 +17,7 @@ import Leap, time
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 from LeapResponse import send_response
 
-FRAME_BUFFER_LIM = 60
+FRAME_BUFFER_LIM = 110
 
 class HandFrame:
 
@@ -124,7 +124,7 @@ class CustomListener(Leap.Listener):
             if not frame.hands.is_empty:
                 # Get the first hand
                 hand = frame.hands[0]
-                x,y,z, pitch, yaw, roll = asser_limits(convert_to_joints(hand_properties(frame)))#not really x,y,z anynmore, now its joints
+                x,y,z, pitch, yaw, roll = assert_limits(convert_to_joints(hand_properties(frame)))#not really x,y,z anynmore, now its joints
                 print(x,y,z,pitch,yaw,roll)
                 # print(len(hand.palm_position))
 
@@ -301,18 +301,20 @@ def convert_to_joints(properties):
     distance_x_z = math.sqrt(x ** 2 + z**2)
 
     # we should validate that the values are within params
-    joint_1 = roll #_roll #joint 1 - base (X-Z axis)
-    joint_2 = yaw #_yaw
-    joint_3 = yaw * y_x_scaling# _yaw
-    joint_4 = roll * distance_x_z#roll * distance of x-z
+    joint_1 = 0 #_roll #joint 1 - base (X-Z axis)
 
-    joint_5 = 0#these two are the hand
+    joint_2 = yaw * y_x_scaling #_yaw
+    joint_3 = 0 # _yaw
+    joint_4 = roll#roll * distance of x-z
+
+    joint_5 = roll * distance_x_z#these two are the hand
     joint_6 = 0#this one is clamping
 
+    print("yaw:%f roll:%f pitch:%f"%(yaw,roll, pitch))
     return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6,
 
 #joints = ['joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
-def asser_limits(converted_joints):
+def assert_limits(converted_joints):
 
     joint_1,joint_2,joint_3,joint_4,joint_5,joint_6 = converted_joints
     lims = joint_limits()
@@ -322,7 +324,7 @@ def asser_limits(converted_joints):
         joint_1 = lims['joint_1'][0]
 
     if joint_2 < lims['joint_2'][0]:
-        joint_1 = lims['joint_2'][0]
+        joint_2 = lims['joint_2'][0]
 
     if joint_3 < lims['joint_3'][0]:
         joint_3 = lims['joint_3'][0]
