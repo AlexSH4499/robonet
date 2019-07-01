@@ -301,14 +301,14 @@ def convert_to_joints(properties):
     distance_x_z = math.sqrt(x ** 2 + z**2)
 
     # we should validate that the values are within params
-    joint_1 = 0 #_roll #joint 1 - base (X-Z axis)
+    joint_1 = roll #joint 1 - base (X-Z axis)
 
-    joint_2 = yaw * y_x_scaling #_yaw
-    joint_3 = 0 # _yaw
-    joint_4 = roll#roll * distance of x-z
-
-    joint_5 = roll * distance_x_z#these two are the hand
-    joint_6 = 0#this one is clamping
+    joint_2 = pitch#yaw * y_x_scaling #_yaw | main vertical trunk XY rotation
+    joint_3 = yaw * y_x_scaling# top joint XY plane rotation
+    joint_4 = roll #distance of x-z| X-Z arm
+    joint_5 = pitch #XY plane of hand
+    #joint_5 = roll * distance_x_z#these two are the hand
+    joint_6 = yaw#this one is wrist rotation
 
     print("yaw:%f roll:%f pitch:%f"%(yaw,roll, pitch))
     return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6,

@@ -7,8 +7,6 @@ import time
 import json
 import requests
 
-#from samples import LeapResponse.receive_response
-
 #API ADDRESS
 API_ROOT = 'http://192.168.1.21:8000/requests/'#works as tested on Niryo robot
 #ask for data by maintaining a request open
@@ -23,18 +21,16 @@ def open_connection_to_API():
 
 def cleanse_data(req):
     data = req.json()
-    print(data)
-    print('\n\n')
+    # print(data)
+    # print('\n\n')
     for entry in data:
         entry.pop('uid')
         entry.pop('executed')
         entry.pop('robot_to_send')
     return data
 
-limit = 0.3#placeholder limit
 def extract_movement(data={}):
     movement = []
-    # print(type(data))
     #for k, v in data: error in Python 2, only works in 3
     for k,v in sorted(data.iteritems()):
         joint = float(v)
@@ -47,8 +43,8 @@ def movements(json_data=[]):
     for entry in  json_data:
         moves.append(extract_movement(data=entry))
 
-    for move in moves:
-        print(move)
+    for idx,move in enumerate(moves):
+        print('[%d]:%s'%(idx,move))
     print('\n\n')
     return moves
 
@@ -76,11 +72,17 @@ def debugging():
         rospy.init_node('niryo_one_example_python_api')
         n = NiryoOne()
         while True:
+            print("\nCommencing cycle of requests...\n")
             original_data = open_connection_to_API()
             json_data = cleanse_data(original_data)
-            print('Original data: %s'%original_data)
+            print('Original data:')
+            for idx, entry in enumerate(original_data):
+                print("[%d]: %s"%(idx,entry))
             print('\n')
-            print('Json data: %s'%json_data)
+
+            print('Json data:')
+            for idx, entry in enumerate(json_data):
+                print("[%d]: %s"%(idx,entry))
             print('\n')
             for entry in  json_data:
                 print(entry)
@@ -94,16 +96,11 @@ def debugging():
 
             try:
 
-
                 n.set_arm_max_velocity(100)
-                # move =moves[0]
-                # print(move)
                 for move in moves:
                     print(move)
-                    #n.move_pose(move)
                     n.move_joints(move)
-                    #PUT executed = true in the database
-                    time.sleep(1)
+                    time.sleep(.5)
 
 
 
@@ -111,10 +108,14 @@ def debugging():
                 print(e)
 
             finally:
+                #mark all requests as processed
                 for data in original_data.json():
                     data['executed'] = True
-                    requests.put(API_ROOT + str(data['uid']) + '/', data=data,auth=('mec123','mec123'))
-            time.sleep(.500)
+                    #update database
+                    requests.put(API_ROOT + str(data['uid']) + '/',
+                                        data=data,auth=('mec123','mec123'))
+            print("Ending cycle of requests...\n")
+            time.sleep(.250)
     except KeyboardInterrupt:
         print("Niryo Session Terminated\n\n")
     return
