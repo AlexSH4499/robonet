@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 import sys,os,inspect
+import math
+
 from collections import OrderedDict
 
 print(sys.path.insert(0,'C:\\LeapDeveloperKit_2.3.1+31549_win\\LeapSDK\\lib\\x64'))
@@ -28,6 +30,8 @@ class HandFrame:
         self.roll = roll
         return self
 
+
+
     def __str__(self):
         vars = [(k,v) for k,v in self.__dict__]
         return list(vars)
@@ -48,6 +52,7 @@ class CustomListener(Leap.Listener):
         print( "Initialized")
         self.clamp = 0
 
+    '''UPDATE THESE VARIABLE NAMES, THEY'RE WRONG!'''
     def averaged_position(self, frame_list):
         _x,_y,_z,_pitch,_roll,_yaw = 0, 0, 0, 0, 0, 0
         # print(frame_list)
@@ -119,7 +124,7 @@ class CustomListener(Leap.Listener):
             if not frame.hands.is_empty:
                 # Get the first hand
                 hand = frame.hands[0]
-                x,y,z, pitch, yaw, roll = hand_properties(frame)
+                x,y,z, pitch, yaw, roll = asser_limits(convert_to_joints(hand_properties(frame)))#not really x,y,z anynmore, now its joints
                 print(x,y,z,pitch,yaw,roll)
                 # print(len(hand.palm_position))
 
@@ -127,10 +132,13 @@ class CustomListener(Leap.Listener):
                 hand_props.append(x)
                 hand_props.append(y)
                 hand_props.append(z)
-                hand_props.append(pitch* Leap.RAD_TO_DEG)# x rotation degrees
-                hand_props.append(yaw* Leap.RAD_TO_DEG)#y rotation degrees
-                hand_props.append(roll* Leap.RAD_TO_DEG)# z rotation degrees
-                #print(hand_properties)
+                # hand_props.append(pitch* Leap.RAD_TO_DEG)# x rotation degrees
+                # hand_props.append(yaw* Leap.RAD_TO_DEG)#y rotation degrees
+                # hand_props.append(roll* Leap.RAD_TO_DEG)# z rotation degrees
+                hand_props.append(pitch)# x rotation rads
+                hand_props.append(yaw)#y rotation rads
+                hand_props.append(roll)# z rotation rads
+                print(hand_props)
 
                 MIN_SPEED=20.0
                 MAX_SPEED=80.0
@@ -256,6 +264,11 @@ class CustomListener(Leap.Listener):
     #     self.controller.remove_listener(self)
     #     return
 
+def joint_limits():
+    limits = OrderedDict({'joint_1':(-3.053,3.053),'joint_2':(-1.919,0.639),'joint_3':(-1.396,1.57),
+                        'joint_4':(-3.053,3.053),'joint_5':(-1.744, 1.919),'joint_6':(-2.573,2.573)})
+    return limits
+
 def hand_properties(frame):
 
     hand = frame.hands.rightmost
@@ -275,6 +288,75 @@ def hand_properties(frame):
     # return position, pitch, yaw, roll
     return x, y, z, pitch, yaw, roll
 
+def convert_to_joints(properties):
+    if len(properties)  is not  6 :
+        raise ValueError("Not a valid property structure!\n\n")
+
+    x,y,z,pitch,yaw,roll = properties
+
+    if properties[0] != 0:
+        y_x_scaling = properties[1] / properties[0]# y / x
+    else:
+        y_x_scaling = 1
+    distance_x_z = math.sqrt(x ** 2 + z**2)
+
+    # we should validate that the values are within params
+    joint_1 = roll #_roll #joint 1 - base (X-Z axis)
+    joint_2 = yaw #_yaw
+    joint_3 = yaw * y_x_scaling# _yaw
+    joint_4 = roll * distance_x_z#roll * distance of x-z
+
+    joint_5 = 0#these two are the hand
+    joint_6 = 0#this one is clamping
+
+    return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6,
+
+#joints = ['joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
+def asser_limits(converted_joints):
+
+    joint_1,joint_2,joint_3,joint_4,joint_5,joint_6 = converted_joints
+    lims = joint_limits()
+
+    #minimums
+    if joint_1 < lims['joint_1'][0]:
+        joint_1 = lims['joint_1'][0]
+
+    if joint_2 < lims['joint_2'][0]:
+        joint_1 = lims['joint_2'][0]
+
+    if joint_3 < lims['joint_3'][0]:
+        joint_3 = lims['joint_3'][0]
+
+    if joint_4 < lims['joint_4'][0]:
+        joint_4 = lims['joint_4'][0]
+
+    if joint_5 < lims['joint_5'][0]:
+        joint_5 = lims['joint_5'][0]
+
+    if joint_6 < lims['joint_6'][0]:
+        joint_6 = lims['joint_6'][0]
+
+    #maximums
+    if joint_1 > lims['joint_1'][1]:
+        joint_1 = lims['joint_1'][1]
+
+    if joint_2 > lims['joint_2'][1]:
+        joint_2 = lims['joint_2'][1]
+
+    if joint_3 > lims['joint_3'][1]:
+        joint_3 = lims['joint_3'][1]
+
+    if joint_4 > lims['joint_4'][1]:
+        joint_4 = lims['joint_4'][1]
+
+    if joint_5 > lims['joint_5'][1]:
+        joint_5 = lims['joint_5'][1]
+
+    if joint_6 > lims['joint_6'][1]:
+        joint_6 = lims['joint_6'][1]
+
+
+    return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6
 
 def main():
 

@@ -76,7 +76,8 @@ def main():
     return
 
 def debugging():
-    json_data = cleanse_data(open_connection_to_API())
+    original_data = open_connection_to_API()
+    json_data = cleanse_data(original_data)
     for entry in  json_data:
         print(entry)
     print('\n\n')
@@ -94,6 +95,7 @@ def debugging():
             print(move)
             #n.move_pose(move)
             n.move_joints(move)
+            #PUT executed = true in the database
             time.sleep(1)
 
 
@@ -102,6 +104,9 @@ def debugging():
         print(e)
 
     finally:
+        for data in original_data.json():
+            data['executed'] = True
+            requests.put(API_ROOT + str(data['uid']) + '/', data=data,auth=('mec123','mec123'))
         print("Niryo Session Terminated\n")
     return
 
