@@ -48,14 +48,29 @@ _This portion makes the assumption that all necessary packages have been previou
 
 >This command will make the HTTP server run on port 8000 such that we can communicate with it using our robot.
 
->Now that it's running we can open up another terminal, change again into the projects main folder and when inside activate a Python 3.7.x+ environment.
+>Now that it's running we can open up another terminal, change again into the project's main folder and when inside activate a Python 3.7.x+ environment.
 
 >Once this step is finished, execute the following command "python leap_motion_controller.py" and this will cause the terminal to seek the Leap Motion USB device.
 
->Wait until the terminal says "Connected" to confirm that we are properly communicating with it.(Sometimes the Leap SDK ignores the USB device and requires a fresh install.)
+_If you're encountering problems, **verify** that your **environment variable (or PATH)** has the proper **Python & Python version active**._
 
->After establishing the connection, open yet another terminal and SSH
-  into the Niryo robot using the command "ssh niryo@ip_address".
+>Wait until the terminal says "Connected" to confirm that we are properly communicating with the Leap Motion sensor.
+
+_Sometimes the **Leap SDK ignores** the USB device and requires a **fresh install**._
+
+>After establishing the connection, open yet another terminal and open an SSH connection
+  to the Niryo robot using the command "ssh niryo@{ip_address_here}".
+  
+_Replace **{ip_address_here}** with the IP Address of your choice but be mindful that both must be kept within the same LAN or ensure a properly established connection between Computer & Robot._
   
  _In my case, I setup the **IP Address** to be **192.168.1.53** in order to ensure that both, computer and robot, were on the same network as per IPv4 protocol.(Assume the Subnet-Mask to be 24-bits)_
 
+# Known Problems
+
+- Leap Motion Python API has a **memory leak** problem where iterating through **Hand parameters** causes **infinite looping**.
+
+> Possible fix: Implement a **double-underscore-len method** (deunder or magic method as known in Python community) since it seems that LeapPython.cpp does not properly generate with the one provided the in download from official site.
+
+- Leap Motion SDK randomly decides to stop working and won't detect the Leap Motion Sensor.
+
+> Possible fix: Reinstallation of Official SDK seems to fix this issue on Windows OS'.
