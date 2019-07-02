@@ -5,11 +5,18 @@
 
 ---
 
-<p>Important:
-  This project runs on two versions of Python due to incompatibility with Leap Motion SDK and Python 3.0.
-  I tried to compile the SDK from source with no fruits on Windows and ran into problems when trying on Ubuntu Linux Subsystem thanks to  lack of daemon functionality. My apologies for the shortcomings on this part of the project but I really tried my best given my time constraints.</p>
+**Important**
   
---- 
+  This project runs on **two** versions of **Python** due to incompatibility with Leap Motion SDK and Python 3.X.X .
+  I tried to compile the SDK from source with no fruits on Windows and ran into problems when trying on Ubuntu Linux Subsystem thanks to  lack of daemon functionality. My apologies for the shortcomings on this part of the project but I really tried my best given my time constraints.
+  
+---
+
+### Scope & Areas of Interest
+
+> This project covers server backend, networking and high level application development (Layers 4-7 on OSI Model).
+
+---
 
 ## Libraries(or dependencies)
 - Django
@@ -34,7 +41,7 @@
 - django-restframework
 
   
-  ---
+---
   
 **NOTE**
 _This portion makes the assumption that all necessary packages have been previously installed with pip._
