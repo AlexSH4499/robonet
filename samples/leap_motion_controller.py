@@ -17,7 +17,7 @@ import Leap, time
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 from LeapResponse import send_response
 
-FRAME_BUFFER_LIM = 110
+FRAME_BUFFER_LIM = 60
 
 class HandFrame:
 
@@ -39,11 +39,46 @@ class HandFrame:
     def __len__(self):
         return 1
 
-params = [ "uid","robot_to_send","executed",'joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
+class RobotStructure:
+
+    def __init__(self, name=""):
+        self.name = name
+        self.joints = (('joint_1',0.0),('joint_2',0.0),
+                        ('joint_3',0.0),('joint_4',0.0),
+                        ('joint_5',0.0),('joint_6',0.0),)
+    def joints(self):
+        for joint in self.joints:
+            yield joint
+
+    def __len__(self):
+        return len(self.joints) #should be 6 here but must verify this works
+
+
+class RobotData(OrderedDict):
+
+    def __init__(self, values):
+
+        self.params = ('uid','robot_to_send','executed',
+                    'joint_1','joint_2','joint_3',
+                    'joint_4','joint_5','joint_6')
+        self.values = values
+        return
+    def __params_to_remove(self):
+        return ('uid','robot_to_send','executed',)
+
+    def cleansed_data(self):
+        return {k:v
+                    for k,v in zip(self.params, self.values)
+                     if k not in self.__params_to_remove()}
+                     
+params = [ 'uid','robot_to_send','executed',
+            'joint_1','joint_2','joint_3',
+            'joint_4','joint_5','joint_6']
+
 class CustomListener(Leap.Listener):
 
     def __init__(self):
-        self.i = 11
+        self.i = 0
         super(CustomListener, self).__init__()
         self.buffer = []
         return
@@ -75,21 +110,26 @@ class CustomListener(Leap.Listener):
 
     def frame_buffer(self,frame):
         position = self.averaged_position(self.buffer)
-        values = [self.i , 1 , False]
+        robot = 1
+        executed  = False
+        uid = self.i
+        values = [uid , robot , executed]
 
         for val in position:
             values.append(str(round(val,2)))
-        data = OrderedDict(zip(params,values))
+        data = OrderedDict(zip(params,values))#preserve the order of the joints
+                                              #otherwise, our RESTAPI breaks due to values getting displaced
         if len(self.buffer) >= FRAME_BUFFER_LIM:
             print("Entered The BUFFER LOGiC\n\n\n")
             # with open("BUFFERED.txt","a+") as f:
             #     st = str(avg) + '\n'
             #     f.write(st)
-            resp = send_response(uid=self.i, data=data)
+            resp = send_response(uid=uid, data=data)
             print(resp.json)
             # print(resp.headers)
             print('\n\n\n\n\n')
             self.i = self.i + 1
+
             while len(self.buffer) > 0:
                 self.buffer.pop()
 
@@ -98,7 +138,7 @@ class CustomListener(Leap.Listener):
         return avg
 
     def on_connect(self, controller):
-        print( "Connected")
+        print( "Connected\n\n")
         # Enable gestures
 #        controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE);
  #       controller.enable_gesture(Leap.Gesture.TYPE_KEY_TAP);
@@ -107,13 +147,13 @@ class CustomListener(Leap.Listener):
 
     def on_disconnect(self, controller):
         # Note: not dispatched when running in a debugger.
-        print("Disconnected")
+        print("Disconnected\n\n")
 
     def on_exit(self, controller):
-        print("Exited")
+        print("Exited\n\n")
 
     def on_frame(self, controller):
-        start = time.time()
+        #start = time.time()
         frame = controller.frame()
         hand_props = []
         if(len(frame.hands)!=0 and len(frame.hands)!=2):
@@ -125,7 +165,7 @@ class CustomListener(Leap.Listener):
                 # Get the first hand
                 hand = frame.hands[0]
                 x,y,z, pitch, yaw, roll = assert_limits(convert_to_joints(hand_properties(frame)))#not really x,y,z anynmore, now its joints
-                print(x,y,z,pitch,yaw,roll)
+                # print(x,y,z,pitch,yaw,roll)
                 # print(len(hand.palm_position))
 
 
@@ -138,101 +178,101 @@ class CustomListener(Leap.Listener):
                 hand_props.append(pitch)# x rotation rads
                 hand_props.append(yaw)#y rotation rads
                 hand_props.append(roll)# z rotation rads
-                print(hand_props)
+                # print(hand_props)
 
-                MIN_SPEED=20.0
-                MAX_SPEED=80.0
-
-                #IMPORTANT: Face green light toward you.
-                left_right_velocity = hand.palm_velocity[0] #right:+ #left:- #
-                if abs(left_right_velocity) < MIN_SPEED or abs(left_right_velocity) > 500:
-                    adjusted_lrv = 0.0
-                elif(left_right_velocity >= MAX_SPEED):
-                    adjusted_lrv = 1.0
-                elif (left_right_velocity <= -MAX_SPEED):
-                    adjusted_lrv = -1.0
-                else:
-                    adjusted_lrv = left_right_velocity / MAX_SPEED #adjusted lrv
-                if adjusted_lrv != 0:
-                    motor4="4%f\n" % (adjusted_lrv)
-                    #s.send(motor4)  #//////////////////////////////////////////////////////////////////////// LEFT-RIGHT
-                    #print(motor4)
-
-                # up is harder than down
-                # moving up + down should have higher min speed?
-                up_down_velocity = hand.palm_velocity[1] #up:+ #down:-
-                if abs(up_down_velocity) < MIN_SPEED or abs(up_down_velocity) > 500:
-                    adjusted_udv = 0.0
-                elif(up_down_velocity >= MAX_SPEED):
-                    adjusted_udv = 1.0
-                elif(up_down_velocity <= -MAX_SPEED):
-                    adjusted_udv = -1.0
-                else:
-                    adjusted_udv = up_down_velocity / MAX_SPEED     #adjusted udv
-                if adjusted_udv != 0:
-                    #motor2="2%f\n" % (adjusted_udv * (-1/4.0)) #might be positive !~!~!~!~!~!~!~!~~!~!~!~!~!
-                    motor2="2%f\n" % (adjusted_udv * (3/4.0))
-                    #s.send(motor2)  #//////////////////////////////////////////////////////////////////////// UP-DOWN
-                    print(motor2)
-
-                forward_back_velocity = -hand.palm_velocity[2] #back:- #frwd:+
-                #print "forward back: %f" % forward_back_velocity
-                if abs(forward_back_velocity) < MIN_SPEED or abs(forward_back_velocity) > 500:
-                    adjusted_fbv = 0.0
-                elif(forward_back_velocity >= MAX_SPEED):
-                    adjusted_fbv = 1.0
-                elif(forward_back_velocity <= -MAX_SPEED):
-                    adjusted_fbv = -1.0
-                else:
-                    adjusted_fbv = forward_back_velocity / MAX_SPEED #adjusted fbv
-                if adjusted_fbv != 0:
-                    #motor2="2%f\n" % (adjusted_fbv * (1.0/4.0)) #may not work! probably will ~!~!~!~!~!~~~!!~
-                    motor3="3%f\n" % (adjusted_fbv * (3.0/4.0))
-                    #s.send(motor3)  #//////////////////////////////////////////////////////////////////////// FRWD-BACK
-                    #print(motor3)
-
-
-
-                # Check if the hand has any fingers
-                fingers = hand.fingers
-                CLAMP_TIME = 30
-                if (len(fingers))>1:
-                    # Calculate the hand's average finger tip position
-                    self.clamp=max(0, self.clamp - 1)
-                    motor0 = "0%f\n" % (-0.5) #////////////////////////////////////////////////////////// OPEN
-                    if self.clamp > 0:
-                        #s.send(motor0)
-                        #print(motor0)
-                        pass
-                else:
-                    self.clamp=min(CLAMP_TIME, self.clamp + 1)
-                    motor0="0%f\n" % (0.5) #////////////////////////////////////////////////////////// CLOSE
-                    if(self.clamp < CLAMP_TIME):
-                        #s.send(motor0)
-                        #print(motor0)
-                        pass
-
-
-
-                # # Get the hand's sphere radius and palm position
-                # print("Hand sphere radius: %f mm, palm position: %s" % (
-                #       hand.sphere_radius, hand.palm_position))
-
-                # Get the hand's normal vector and direction
-                normal = hand.palm_normal
-                direction = hand.direction
-
-                # Calculate the hand's pitch
-                # print("Hand pitch: %f degrees" % (direction.pitch * Leap.RAD_TO_DEG)) #-20 to 20, ignore -10 to 10
-                hand_pitch = direction.pitch * Leap.RAD_TO_DEG
-                if (hand_pitch > 10) and (hand_pitch) < 25:
-                    motor1 = "1%f\n" % (0.4) #////////////////////////////////////////////////////////// WRIST UP
-                    #s.send(motor1)
-                    #print(motor1)
-                elif(hand_pitch > -20) and (hand_pitch < -10):
-                    motor1 = "1%f\n" % (-0.4) #///////////////////////////////////////////////////////// WRIST DOWN
-                    #s.send(motor1)
-                    #print(motor1)
+                # MIN_SPEED=20.0
+                # MAX_SPEED=80.0
+                #
+                # #IMPORTANT: Face green light toward you.
+                # left_right_velocity = hand.palm_velocity[0] #right:+ #left:- #
+                # if abs(left_right_velocity) < MIN_SPEED or abs(left_right_velocity) > 500:
+                #     adjusted_lrv = 0.0
+                # elif(left_right_velocity >= MAX_SPEED):
+                #     adjusted_lrv = 1.0
+                # elif (left_right_velocity <= -MAX_SPEED):
+                #     adjusted_lrv = -1.0
+                # else:
+                #     adjusted_lrv = left_right_velocity / MAX_SPEED #adjusted lrv
+                # if adjusted_lrv != 0:
+                #     motor4="4%f\n" % (adjusted_lrv)
+                #     #s.send(motor4)  #//////////////////////////////////////////////////////////////////////// LEFT-RIGHT
+                #     #print(motor4)
+                #
+                # # up is harder than down
+                # # moving up + down should have higher min speed?
+                # up_down_velocity = hand.palm_velocity[1] #up:+ #down:-
+                # if abs(up_down_velocity) < MIN_SPEED or abs(up_down_velocity) > 500:
+                #     adjusted_udv = 0.0
+                # elif(up_down_velocity >= MAX_SPEED):
+                #     adjusted_udv = 1.0
+                # elif(up_down_velocity <= -MAX_SPEED):
+                #     adjusted_udv = -1.0
+                # else:
+                #     adjusted_udv = up_down_velocity / MAX_SPEED     #adjusted udv
+                # if adjusted_udv != 0:
+                #     #motor2="2%f\n" % (adjusted_udv * (-1/4.0)) #might be positive !~!~!~!~!~!~!~!~~!~!~!~!~!
+                #     motor2="2%f\n" % (adjusted_udv * (3/4.0))
+                #     #s.send(motor2)  #//////////////////////////////////////////////////////////////////////// UP-DOWN
+                #     print(motor2)
+                #
+                # forward_back_velocity = -hand.palm_velocity[2] #back:- #frwd:+
+                # #print "forward back: %f" % forward_back_velocity
+                # if abs(forward_back_velocity) < MIN_SPEED or abs(forward_back_velocity) > 500:
+                #     adjusted_fbv = 0.0
+                # elif(forward_back_velocity >= MAX_SPEED):
+                #     adjusted_fbv = 1.0
+                # elif(forward_back_velocity <= -MAX_SPEED):
+                #     adjusted_fbv = -1.0
+                # else:
+                #     adjusted_fbv = forward_back_velocity / MAX_SPEED #adjusted fbv
+                # if adjusted_fbv != 0:
+                #     #motor2="2%f\n" % (adjusted_fbv * (1.0/4.0)) #may not work! probably will ~!~!~!~!~!~~~!!~
+                #     motor3="3%f\n" % (adjusted_fbv * (3.0/4.0))
+                #     #s.send(motor3)  #//////////////////////////////////////////////////////////////////////// FRWD-BACK
+                #     #print(motor3)
+                #
+                #
+                #
+                # # Check if the hand has any fingers
+                # fingers = hand.fingers
+                # CLAMP_TIME = 30
+                # if (len(fingers))>1:
+                #     # Calculate the hand's average finger tip position
+                #     self.clamp=max(0, self.clamp - 1)
+                #     motor0 = "0%f\n" % (-0.5) #////////////////////////////////////////////////////////// OPEN
+                #     if self.clamp > 0:
+                #         #s.send(motor0)
+                #         #print(motor0)
+                #         pass
+                # else:
+                #     self.clamp=min(CLAMP_TIME, self.clamp + 1)
+                #     motor0="0%f\n" % (0.5) #////////////////////////////////////////////////////////// CLOSE
+                #     if(self.clamp < CLAMP_TIME):
+                #         #s.send(motor0)
+                #         #print(motor0)
+                #         pass
+                #
+                #
+                #
+                # # # Get the hand's sphere radius and palm position
+                # # print("Hand sphere radius: %f mm, palm position: %s" % (
+                # #       hand.sphere_radius, hand.palm_position))
+                #
+                # # Get the hand's normal vector and direction
+                # normal = hand.palm_normal
+                # direction = hand.direction
+                #
+                # # Calculate the hand's pitch
+                # # print("Hand pitch: %f degrees" % (direction.pitch * Leap.RAD_TO_DEG)) #-20 to 20, ignore -10 to 10
+                # hand_pitch = direction.pitch * Leap.RAD_TO_DEG
+                # if (hand_pitch > 10) and (hand_pitch) < 25:
+                #     motor1 = "1%f\n" % (0.4) #////////////////////////////////////////////////////////// WRIST UP
+                #     #s.send(motor1)
+                #     #print(motor1)
+                # elif(hand_pitch > -20) and (hand_pitch < -10):
+                #     motor1 = "1%f\n" % (-0.4) #///////////////////////////////////////////////////////// WRIST DOWN
+                #     #s.send(motor1)
+                #     #print(motor1)
 
             # print "%f seconds" % (time.time() - start)
             averaged_position = self.frame_buffer(tuple(hand_props))
@@ -310,7 +350,8 @@ def convert_to_joints(properties):
     #joint_5 = roll * distance_x_z#these two are the hand
     joint_6 = yaw#this one is wrist rotation
 
-    print("yaw:%f roll:%f pitch:%f"%(yaw,roll, pitch))
+    print("X: %f | Y: %f | Z: %f | Palm-Pitch: %f | Palm-Yaw: %f | Palm-Roll: %f"%(x,y,z,pitch,yaw,roll))
+    print("J1: %f | J2: %f | J3: %f | J4: %f | J5: %f | J6: %f\n\n"%(x,y,z,pitch,yaw,roll))
     return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6,
 
 #joints = ['joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
@@ -380,3 +421,11 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+import unittest
+
+class RobotTest(unittest.TestCase):
+
+    def test_len(self):
+        robot = RobotStructure()
+        self.assertTrue(len(robot) == 6)
