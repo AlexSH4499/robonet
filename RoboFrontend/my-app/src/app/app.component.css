@@ -1,0 +1,62 @@
+
+
+.table-head{
+    background: #828385;
+    color: white;
+}
+
+table{
+    font-weight: normal;
+    width:100%;
+    background: #ffffff;
+    color:#000000;
+    padding: 1%;
+    align-content: center;
+    border-radius: 5px; 
+    border-collapse: collapse;
+}
+
+tr{
+    text-align: center;
+   
+}
+
+th{
+    border-bottom: 1px solid grey;
+}
+
+
+
+ tr:hover{
+    background-color: #828385;
+    color: #ffffff;
+
+}
+
+.grid-container{
+    display: grid;
+}
+
+.table-container{
+    padding: 1%;
+    align-content: center;
+}
+
+.top{
+    text-size-adjust: 15%;
+    font-weight: bold;
+    text-align: center;
+    padding:0.1%;
+    background: #0f0f0f;
+    color: #ffffff;
+}
+
+.post-button{
+    font-size: 2.5em;
+    color: #ffffff;
+    background:  #CD040B;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+   
+}

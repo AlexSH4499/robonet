@@ -1,0 +1,18 @@
+<h2>Requests</h2>
+
+<div *ngFor="let request of requests | async">
+    <p>Inside the for</p>
+    <table>
+        <tr>
+            <th>{{request.uid}}</th>
+            <th>{{request.executed}}</th>
+            <th>{{request.robot_to_send}}</th>
+            <th>{{request.joint_1}}</th>
+            <th>{{request.joint_2}}</th>
+            <th>{{request.joint_3}}</th>
+            <th>{{request.joint_4}}</th>
+            <th>{{request.joint_5}}</th>
+            <th>{{request.joint_6}}</th>
+        </tr>
+    </table>
+</div>
