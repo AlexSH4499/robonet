@@ -6,7 +6,11 @@ import { AppComponent } from './app.component';
 import { RequestsListComponent } from './requests-list/requests-list.component';
 import { RequestComponent } from './request/request.component';
 import {RequestService} from './request.service';
+import {FormsModule} from '@angular/forms';
+import {ReactiveFormsModule} from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import {MatButtonModule, MatCheckboxModule, MatSliderModule} from '@angular/material';
 @NgModule({
   declarations: [
     AppComponent,
@@ -17,7 +21,11 @@ import {RequestService} from './request.service';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    MatSliderModule,
   ],
   providers: [RequestService],
   bootstrap: [AppComponent]

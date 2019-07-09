@@ -13,6 +13,7 @@ src_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
 print(src_dir)
 arch_dir = '../lib/x64'
 sys.path.insert(0, os.path.abspath(os.path.join(src_dir, arch_dir)))
+
 import Leap, time
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 from LeapResponse import send_response
@@ -46,6 +47,8 @@ class RobotStructure:
         self.joints = (('joint_1',0.0),('joint_2',0.0),
                         ('joint_3',0.0),('joint_4',0.0),
                         ('joint_5',0.0),('joint_6',0.0),)
+        return
+
     def joints(self):
         for joint in self.joints:
             yield joint

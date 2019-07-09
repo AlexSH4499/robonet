@@ -4,6 +4,8 @@ leap_python3\
 model\
 data\
 lib\
+RoboFrontend\my-app\e2e\
+RoboFrontend\my-app\node_modules\
 Sample.cpp
 Sample.cs
 Sample.java

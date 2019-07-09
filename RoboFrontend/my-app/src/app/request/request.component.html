@@ -10,10 +10,74 @@
     <span>{{item.joint_4}} </span>
     <span>{{item.joint_5}} </span>
     <span>{{item.joint_6}} </span>
-</div>
+</div> -->
+
+<!-- <form [formGroup]="requestForm" (ngSubmit)="onSubmit(requestForm.value)"> -->
+<form [formGroup]="requestForm" >
+
+       
+        <div class="field" >
+            <label>Unique ID</label>
+            <input type="text" name="uid" formControlName = "uid" />
+        </div >
+
+        <div class="field">
+            <label>Robot To Request</label>
+            <input type="text" name="robot_to_send" formControlName = "robot_to_send" />
+        </div >
+
+        <div class="field">
+            <label>Execution Status</label>
+            <input type="text" name="executed" formControlName = "executed"/>
+        </div>
+
+        <div class="field">
+            <label>Joint 1</label>
+            <input matInput placeholder=Range  type="text" name="joint_1" formControlName = "joint_1" />
+            <!-- <mat-slider [(ngModel)]= "rangeValue" >Joint 1</mat-slider> -->
+        </div>
 
 
-<form [formGroup]="requestForm" (ngSubmit)="onSubmit(checkoutForm.value)">
+        <div class="field">
+            <label>Joint 2</label>
+            <input matInput placeholder=Range  type="text" name="joint_2"  formControlName = "joint_2"/>
+            <!-- <mat-slider [(ngModel)]= "rangeValue" >Joint 2</mat-slider> -->
+        </div>
+        
+        <div class="field">
+            <label>Joint 3</label>
+            <input matInput placeholder=Range  type="text" name="joint_3" formControlName = "joint_3" />
+            <!-- <mat-slider [(ngModel)]= "rangeValue" >Joint 3</mat-slider> -->
+        </div>
 
-        <button class="post-button" type="submit" (click)="post()">Post</button>
-    </form> -->
+        <div class="field">
+            <label>Joint 4</label>
+            <input matInput placeholder=Range  type="text" name="joint_4" formControlName = "joint_4"/>
+            <!-- <mat-slider [(ngModel)]= "rangeValue" >Joint 4</mat-slider> -->
+        </div>
+
+        <div class="field">
+            <label>Joint 5</label>
+            <input matInput placeholder=Range  type="text" name="joint_5" formControlName = "joint_5"/>
+            <!-- <mat-slider [(ngModel)]= "rangeValue" >Joint 5</mat-slider> -->
+        </div>
+        
+        <div class="field">
+            <label>Joint 6</label>
+            <input matInput placeholder=Range  type="text" name="joint_6"  formControlName = "joint_6"/>
+            <!-- <mat-slider [(ngModel)]= "rangeValue" >Joint 6</mat-slider> -->
+        </div>
+        <!-- <mat-slider min="1" max="5" step="0.5" value="1.5"> Joint 2</mat-slider>
+
+        <mat-slider min="1" max="5" step="0.5" value="1.5">Joint 3</mat-slider>
+
+        <mat-slider min="1" max="5" step="0.5" value="1.5">Joint 4</mat-slider>
+
+        <mat-slider min="1" max="5" step="0.5" value="1.5">Joint 5</mat-slider>
+
+        <mat-slider min="1" max="5" step="0.5" value="1.5">Joint 6</mat-slider> -->
+
+        <button class="post-button" type="submit" (click)="onSubmit(requestForm.value)" >Post</button>
+
+
+</form>

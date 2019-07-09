@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { RequestComponent } from './request/request.component';
+import { RequestComponent, Movement } from './request/request.component';
 import { RequestService} from './request.service';
 
 @Component({
@@ -10,7 +10,8 @@ import { RequestService} from './request.service';
 export class AppComponent implements OnInit{
 
   requests: RequestComponent[];
-
+  moveModel = new Movement(11,1,false,
+                              0.0,0.0,0.0,0.0,0.0,0.0);
    constructor(private requestService: RequestService){
 
    }
