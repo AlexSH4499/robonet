@@ -34,7 +34,7 @@ class HandFrame:
         self.pitch = pitch
         self.yaw = yaw
         self.roll = roll
-        return self
+        return
 
     def __str__(self):
         vars = [(k,v) for k,v in self.__dict__]
@@ -56,15 +56,11 @@ class RobotStructure:
 
     def joints_limits(self):
         num_lims = zip(self.joint_mins(), self.joint_maxs())
-        # limits = OrderedDict({'joint_1':(-3.053,3.053),'joint_2':(-1.919,0.639),'joint_3':(-1.396,1.57),
-                        # 'joint_4':(-3.053,3.053),'joint_5':(-1.744, 1.919),'joint_6':(-2.573,2.573)})
         limits = OrderedDict(zip(self.str_joints(), num_lims))
         for k,v in limits.items():
             yield k,v 
 
     def joints(self):
-        # for joint in self._joints.items():
-        #     yield joint
         return self._joints
 
     def joint_mins(self):
@@ -101,29 +97,22 @@ class RobotStructure:
 
     def assert_joint_limits(self, joint, value):
         lims = {k:v for k,v in self.joints_limits()}
-        print('Type of joint:{}'.format(type(joint)))
-        print("Type of lims:{}\n".format(type(lims[joint])))
         if value > self.max_of_joint(lims[joint]):
-            print("Value:{} | Max:{}\n".format(value,self.max_of_joint(lims[joint])))
             return self.max_of_joint(lims[joint])
         
         if value <  self.min_of_joint(lims[joint]):
-            print("Value:{} | Min:{}\n".format(value,self.min_of_joint(lims[joint])))
             return self.min_of_joint(lims[joint])
 
-        print("Value:{} | Min:{} | Max:{}\n".format(value,self.min_of_joint(lims[joint]), self.max_of_joint(lims[joint])))
         return value
 
     def __len__(self):
-        return len(self.joints) #should be 6 here but must verify this works
+        return len(self._joints) #should be 6 here but must verify this works
 
     #we need to fix this, somehow idk...
     def __str__(self):
-        str_robot = 'UID:{}\t|\tName:{}\n'.format(self.uid, self.name)
-        # for k,v in [self.joints()]:
-        #     str_robot.append('|{} : {}|\t'.format(k , v))
-        # str_robot.append('\n')
-        return str_robot
+        str_robot = ['UID:',self.uid,'\t|\tName:',self.name,'\n']
+        str_joints = ['|'+str(k)+':' +str(v) + '|\t' for k,v in self.joints()]
+        return str(str_robot) + str(str_joints)
 
 class RobotData(OrderedDict):
 
@@ -229,17 +218,13 @@ class CustomListener(Leap.Listener):
         print("Exited\n\n")
 
     def on_frame(self, controller):
-        #start = time.time()
+
         frame = controller.frame()
         hand_props = []
         if(len(frame.hands)!=0 and len(frame.hands)!=2):
-            # Get the most recent frame and report some basic information
-            #print "Frame id: %d, timestamp: %d, hands: %d, fingers: %d, tools: %d, gestures: %d" % (
-            #      frame.id, frame.timestamp, len(frame.hands), len(frame.fingers), len(frame.tools), len(frame.gestures()))
 
             if not frame.hands.is_empty:
-                # Get the first hand
-                #hand = frame.hands[0]
+
                 str_joints = self.robot.str_joints()
                 current_joints =  zip(str_joints, convert_to_joints(hand_properties(frame)))#data received from Leap Motion
                 #print("Current joints:{}\n".format(current_joints))
@@ -249,7 +234,7 @@ class CustomListener(Leap.Listener):
                     di = {joint:val}
                     #This Line is not executing for whatever reason
                     #print(self.robot._joints.update(di))#Update our internal RobotStructure Object, automatically handles our joints' limits 
-                    print(self.robot.update_joint(updated_joint=di))
+                    self.robot.update_joint(updated_joint=di)
                     print("Robot joints:{}\n\n".format(self.robot.joints()))
 
                 for val in self.robot.joints().values():
@@ -365,10 +350,10 @@ def convert_to_joints(properties):
     joint_6 = yaw#this one is wrist rotation
 
     print("|Hand Properties|\n")
-    print("X: %f | Y: %f | Z: %f |\n Palm-Pitch: %f | Palm-Yaw: %f | Palm-Roll: %f |\n Finger Yaw:%f|\n\n"%(x,y,z,pitch,yaw,roll, finger_yaw))
+    print("\tX: %f | Y: %f | Z: %f |\n Palm-Pitch: %f | Palm-Yaw: %f | Palm-Roll: %f |\n Finger Yaw:%f|\n\n"%(x,y,z,pitch,yaw,roll, finger_yaw))
     
     print("|Joint Conversions|\n")
-    print("J1: %f | J2: %f | J3: %f | J4: %f | J5: %f | J6: %f\n\n"%(x,y,z,pitch,yaw,roll))
+    print("\tJ1: %f | J2: %f | J3: %f | J4: %f | J5: %f | J6: %f\n\n"%(x,y,z,pitch,yaw,roll))
     return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6,
 
 
