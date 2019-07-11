@@ -72,6 +72,16 @@ _Replace **{ip_address_here}** with the IP Address of your choice but be mindful
   
  _In my case, I setup the **IP Address** to be **192.168.1.53** in order to ensure that both, computer and robot, were on the same network as per IPv4 protocol.(Assume the Subnet-Mask to be 24-bits)_
 
+---
+
+>To Run leap_motion_controller.py make sure to be using Python 2.7 virtualenv
+
+_Ensure the script is in same directory as Leap Motion Developer Kit. Note, this script is designed to run on Windows OS due to src_dir(assumes  SDK is installed directly on C drive) variable and path insertion of SDK using Windows style directories. If you wish to run this in Linux, make the appropriate changes to src_dir and the path insertion._
+
+> Run the command _python leap_motion_controller.py_ in the command line and await _*Connected*_ to appear on screen.
+
+---
+
 # Known Problems
 
 - Leap Motion Python API has a **memory leak** problem where iterating through **Hand parameters** causes **infinite looping**.
