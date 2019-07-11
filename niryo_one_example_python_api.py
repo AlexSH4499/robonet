@@ -23,25 +23,24 @@ def cleanse_data(req):
     data = req.json()
     # print(data)
     # print('\n\n')
-    for entry in data:
+    for entry in data:#Each entry is an Ordered Dictionary Object
         entry.pop('uid')
         entry.pop('executed')
         entry.pop('robot_to_send')
     return data
 
 def extract_movement(data={}):
-    movement = []
+    movement = [float(v)  for k,v in sorted(data.items())]
     #for k, v in data: error in Python 2, only works in 3
-    for k,v in sorted(data.iteritems()):
-        joint = float(v)
-        movement.append(joint)
+    # for k,v in sorted(data.iteritems()):
+    #     joint = float(v)
+    #     movement.append(joint)
     return movement
 
-
 def movements(json_data=[]):
-    moves = []
-    for entry in  json_data:
-        moves.append(extract_movement(data=entry))
+    moves = [ extract_movement(data=entry) for entry in json_data]
+    # for entry in  json_data:
+    #     moves.append(extract_movement(data=entry))
 
     for idx,move in enumerate(moves):
         print('[%d]:%s'%(idx,move))
@@ -71,22 +70,23 @@ def debugging():
     try:
         rospy.init_node('niryo_one_example_python_api')
         n = NiryoOne()
+
         while True:
             print("\nCommencing cycle of requests...\n")
             original_data = open_connection_to_API()
             json_data = cleanse_data(original_data)
-            print('Original data:')
-            for idx, entry in enumerate(original_data):
-                print("[%d]: %s"%(idx,entry))
-            print('\n')
+            # print('Original data:')
+            # for idx, entry in enumerate(original_data):
+            #     print("[%d]: %s"%(idx,entry))
+            # print('\n')
 
-            print('Json data:')
-            for idx, entry in enumerate(json_data):
-                print("[%d]: %s"%(idx,entry))
-            print('\n')
-            for entry in  json_data:
-                print(entry)
-            print('\n\n')
+            # print('Json data:')
+            # for idx, entry in enumerate(json_data):
+            #     print("[%d]: %s"%(idx,entry))
+            # print('\n')
+            # for entry in  json_data:
+            #     print(entry)
+            # print('\n\n')
 
             moves = movements(json_data=json_data)
 
@@ -101,8 +101,6 @@ def debugging():
                     print(move)
                     n.move_joints(move)
                     time.sleep(.5)
-
-
 
             except NiryoOneException as e:
                 print(e)

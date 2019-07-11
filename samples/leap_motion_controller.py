@@ -36,8 +36,6 @@ class HandFrame:
         self.roll = roll
         return self
 
-
-
     def __str__(self):
         vars = [(k,v) for k,v in self.__dict__]
         return list(vars)
@@ -57,7 +55,7 @@ class RobotStructure:
         return zip(self.str_joints(), [0.0 for num in range(len([self.str_joints()]))])
 
     def joints_limits(self):
-        num_lims = zip(self.joint_mins, self.joint_maxs)
+        num_lims = zip(self.joint_mins(), self.joint_maxs())
         # limits = OrderedDict({'joint_1':(-3.053,3.053),'joint_2':(-1.919,0.639),'joint_3':(-1.396,1.57),
                         # 'joint_4':(-3.053,3.053),'joint_5':(-1.744, 1.919),'joint_6':(-2.573,2.573)})
         limits = OrderedDict(zip(self.str_joints(), num_lims))
@@ -85,9 +83,10 @@ class RobotStructure:
             yield joint
 
     def update_joint(self, updated_joint={}):
-        key, value = updated_joint.keys(), updated_joint.values()
+        key, value = updated_joint.keys()[0], updated_joint.values()[0]
         value = self.assert_joint_limits( key, value)
-        self.joints().update(key,value)
+        di = {key:value}
+        self.joints().update(di)
         return 
     
     def max_of_joint(self, min_max_tuple=tuple()):
@@ -101,12 +100,18 @@ class RobotStructure:
         return min_max_tuple[0]
 
     def assert_joint_limits(self, joint, value):
-        lims = [self.joints_limits()]
+        lims = {k:v for k,v in self.joints_limits()}
+        print('Type of joint:{}'.format(type(joint)))
+        print("Type of lims:{}\n".format(type(lims[joint])))
         if value > self.max_of_joint(lims[joint]):
+            print("Value:{} | Max:{}\n".format(value,self.max_of_joint(lims[joint])))
             return self.max_of_joint(lims[joint])
         
         if value <  self.min_of_joint(lims[joint]):
+            print("Value:{} | Min:{}\n".format(value,self.min_of_joint(lims[joint])))
             return self.min_of_joint(lims[joint])
+
+        print("Value:{} | Min:{} | Max:{}\n".format(value,self.min_of_joint(lims[joint]), self.max_of_joint(lims[joint])))
         return value
 
     def __len__(self):
@@ -240,9 +245,12 @@ class CustomListener(Leap.Listener):
                 #print("Current joints:{}\n".format(current_joints))
                 
                 for joint, val in current_joints:
+
                     di = {joint:val}
-                    self.robot.joints().update(di)#Update our internal RobotStructure Object, automatically handles our joints' limits 
-                    # print("Robot joints:{}\n\n".format(self.robot.joints()))
+                    #This Line is not executing for whatever reason
+                    #print(self.robot._joints.update(di))#Update our internal RobotStructure Object, automatically handles our joints' limits 
+                    print(self.robot.update_joint(updated_joint=di))
+                    print("Robot joints:{}\n\n".format(self.robot.joints()))
 
                 for val in self.robot.joints().values():
                     # print("value being added to props:{}\n".format(val))
@@ -303,7 +311,7 @@ def hand_properties(frame):
     x = hand.palm_position[0] * (10 ** -3)#convert mm to meters
     y = hand.palm_position[1] * (10 ** -3)#convert mm to meters
     z = hand.palm_position[2] * (10 ** -3)#convert mm to meters
-
+    avg_finger_dir = 1
     finger = hand.fingers[0]
     if len(fingers) < FRAME_BUFFER_LIM:
         fingers.append(finger_properties(finger))
@@ -350,9 +358,9 @@ def convert_to_joints(properties):
     joint_1 = roll #joint 1 - base (X-Z axis)
 
     joint_2 = pitch#yaw * y_x_scaling #_yaw | main vertical trunk XY rotation
-    joint_3 = finger_yaw * y_x_scaling# top joint XY plane rotation
-    joint_4 = roll * distance_x_z#distance of x-z| X-Z arm
-    joint_5 = pitch * y #XY plane of hand
+    joint_3 = finger_yaw # top joint XY plane rotation
+    joint_4 = roll #distance of x-z| X-Z arm
+    joint_5 = pitch #XY plane of hand
     #joint_5 = roll * distance_x_z#these two are the hand
     joint_6 = yaw#this one is wrist rotation
 
