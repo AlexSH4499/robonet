@@ -50,9 +50,6 @@ class RobotStructure:
     def __init__(self,uid=0, name=""):
         self.uid = uid
         self.name = name
-        #self.joints = OrderedDict([('joint_1',0.0),('joint_2',0.0),
-        #                            ('joint_3',0.0),('joint_4',0.0),
-        #                            ('joint_5',0.0),('joint_6',0.0)])
         self._joints = OrderedDict(self.joints_default_position())
         return
 
@@ -237,30 +234,16 @@ class CustomListener(Leap.Listener):
 
             if not frame.hands.is_empty:
                 # Get the first hand
-                hand = frame.hands[0]
-                #x,y,z, pitch, yaw, roll = assert_limits(convert_to_joints(hand_properties(frame)))#not really x,y,z anynmore, now its joints
-                
-                #joint_1, joint_2, joint_3, joint_4,joint_5, joint_6 = convert_to_joints(hand_properties(frame))
+                #hand = frame.hands[0]
                 str_joints = self.robot.str_joints()
                 current_joints =  zip(str_joints, convert_to_joints(hand_properties(frame)))#data received from Leap Motion
                 #print("Current joints:{}\n".format(current_joints))
+                
                 for joint, val in current_joints:
                     di = {joint:val}
                     self.robot.joints().update(di)#Update our internal RobotStructure Object, automatically handles our joints' limits 
                     # print("Robot joints:{}\n\n".format(self.robot.joints()))
-                # print(x,y,z,pitch,yaw,roll)
-                # print(len(hand.palm_position))
 
-
-                # hand_props.append(x)
-                # hand_props.append(y)
-                # hand_props.append(z)
-                # # hand_props.append(pitch* Leap.RAD_TO_DEG)# x rotation degrees
-                # # hand_props.append(yaw* Leap.RAD_TO_DEG)#y rotation degrees
-                # # hand_props.append(roll* Leap.RAD_TO_DEG)# z rotation degrees
-                # hand_props.append(pitch)# x rotation rads
-                # hand_props.append(yaw)#y rotation rads
-                # hand_props.append(roll)# z rotation rads
                 for val in self.robot.joints().values():
                     # print("value being added to props:{}\n".format(val))
                     hand_props.append(val)
@@ -273,8 +256,6 @@ class CustomListener(Leap.Listener):
             #Empty out the props for next frame
             while len(hand_props):
                 hand_props.pop()
-
-        # we need to create a buffere here to limit how many requests are made
 
     def state_string(self, state):
         if state == Leap.Gesture.STATE_START:
@@ -296,11 +277,6 @@ class CustomListener(Leap.Listener):
     # def __exit__(self):
     #     self.controller.remove_listener(self)
     #     return
-
-# def joint_limits():
-#     limits = OrderedDict({'joint_1':(-3.053,3.053),'joint_2':(-1.919,0.639),'joint_3':(-1.396,1.57),
-#                         'joint_4':(-3.053,3.053),'joint_5':(-1.744, 1.919),'joint_6':(-2.573,2.573)})
-#     return limits
 
 def average_direction(directions):
     sum_x= 0
@@ -351,6 +327,8 @@ def hand_properties(frame):
     return x, y, z, pitch, yaw, roll, finger_yaw
 
 def finger_properties(hand):
+    '''PROBLEM: For some reason the fingers[0] gives a problem,
+    maybe because we have to ensure there exists a finger in the hand to begin with'''
     #print(hand.fingers[0]+'\n')
     #finger_x, finger_y, finger_z = hand.fingers[0].direction
     finger_x, finger_y, finger_z = 0,0,0
@@ -385,52 +363,6 @@ def convert_to_joints(properties):
     print("J1: %f | J2: %f | J3: %f | J4: %f | J5: %f | J6: %f\n\n"%(x,y,z,pitch,yaw,roll))
     return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6,
 
-#joints = ['joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
-# def assert_limits(converted_joints):
-
-#     joint_1,joint_2,joint_3,joint_4,joint_5,joint_6 = converted_joints
-#     lims = joint_limits()
-
-#     #minimums
-#     if joint_1 < lims['joint_1'][0]:
-#         joint_1 = lims['joint_1'][0]
-
-#     if joint_2 < lims['joint_2'][0]:
-#         joint_2 = lims['joint_2'][0]
-
-#     if joint_3 < lims['joint_3'][0]:
-#         joint_3 = lims['joint_3'][0]
-
-#     if joint_4 < lims['joint_4'][0]:
-#         joint_4 = lims['joint_4'][0]
-
-#     if joint_5 < lims['joint_5'][0]:
-#         joint_5 = lims['joint_5'][0]
-
-#     if joint_6 < lims['joint_6'][0]:
-#         joint_6 = lims['joint_6'][0]
-
-#     #maximums
-#     if joint_1 > lims['joint_1'][1]:
-#         joint_1 = lims['joint_1'][1]
-
-#     if joint_2 > lims['joint_2'][1]:
-#         joint_2 = lims['joint_2'][1]
-
-#     if joint_3 > lims['joint_3'][1]:
-#         joint_3 = lims['joint_3'][1]
-
-#     if joint_4 > lims['joint_4'][1]:
-#         joint_4 = lims['joint_4'][1]
-
-#     if joint_5 > lims['joint_5'][1]:
-#         joint_5 = lims['joint_5'][1]
-
-#     if joint_6 > lims['joint_6'][1]:
-#         joint_6 = lims['joint_6'][1]
-
-
-#     return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6
 
 def main():
 
