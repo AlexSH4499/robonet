@@ -118,7 +118,7 @@ def send_file(hostname=ROBOT_IP_ADDRESS, hostkey=None, username="niryo", passwor
 def connect():
     # now, connect and use paramiko Transport to negotiate SSH2 across the connection
     try:
-        send_file(hostname=ROBOT_IP_ADDRESS, hostkey=None, username="niryo",password="robotics", file_to_send="niryo_one_example_python_api.py",directory="/home/niryo/catkin_ws/devel")
+        send_file(hostname=ROBOT_IP_ADDRESS, hostkey=None, username="niryo",password="robotics", file_to_send="niryo_one_example_python_api.py",directory="/home/niryo/catkin_ws/devel/")
     except Exception as e:
         print("*** Caught exception: %s: %s" % (e.__class__, e))
         traceback.print_exc()

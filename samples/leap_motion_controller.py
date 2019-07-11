@@ -4,6 +4,8 @@ import math
 
 from collections import OrderedDict
 
+'''This Logic is so we can add the LEAP SDK to our PATH/ENVIRONMENT_VARIABLE'''
+
 print(sys.path.insert(0,'C:\\LeapDeveloperKit_2.3.1+31549_win\\LeapSDK\\lib\\x64'))
 
 #print(sys.path.insert(0,'C:\\Leap_Motion_Developer_Kit_4.0.0+52173\\LeapSDK\\lib'))
@@ -13,6 +15,9 @@ src_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
 print(src_dir)
 arch_dir = '../lib/x64'
 sys.path.insert(0, os.path.abspath(os.path.join(src_dir, arch_dir)))
+'''
+This should be abstracted and separated into it's own logic and file
+'''
 
 import Leap, time
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
@@ -111,32 +116,36 @@ class CustomListener(Leap.Listener):
             _pitch /= len(frame_list)
         return _x,_y,_z,_pitch,_roll,_yaw
 
+    def default_data(self):
+         robot, executed, uid = 1 , False, self.i
+         values = [uid,robot, executed]
+        return values
+
     def frame_buffer(self,frame):
         position = self.averaged_position(self.buffer)
-        robot = 1
-        executed  = False
-        uid = self.i
-        values = [uid , robot , executed]
+        values = self.default_data()#= [uid , robot , executed]
 
         for val in position:
             values.append(str(round(val,2)))
+
         data = OrderedDict(zip(params,values))#preserve the order of the joints
                                               #otherwise, our RESTAPI breaks due to values getting displaced
-        if len(self.buffer) >= FRAME_BUFFER_LIM:
+        
+        if len(self.buffer) >= FRAME_BUFFER_LIM:# length of buffer is or exceeds our global limit
             print("Entered The BUFFER LOGiC\n\n\n")
             # with open("BUFFERED.txt","a+") as f:
             #     st = str(avg) + '\n'
             #     f.write(st)
-            resp = send_response(uid=uid, data=data)
-            print(resp.json)
-            # print(resp.headers)
+            resp = send_response(uid=uid, data=data)#send our averaged data to REST API
+            #print(resp.json)
+            #print(resp.headers)
             print('\n\n\n\n\n')
             self.i = self.i + 1
 
             while len(self.buffer) > 0:
-                self.buffer.pop()
-
-        self.buffer.append(frame)
+                self.buffer.pop()#empty our buffer
+        else:
+            self.buffer.append(frame)#add frame to buffer
         avg = self.averaged_position(self.buffer)
         return avg
 
@@ -239,6 +248,7 @@ def hand_properties(frame):
 
     hand = frame.hands.rightmost
 
+    #Cannot be unpacked due to improper wrapping of tuples and lack of len implementation in Python API
     x = hand.palm_position[0] * (10 ** -3)#convert mm to meters
     y = hand.palm_position[1] * (10 ** -3)#convert mm to meters
     z = hand.palm_position[2] * (10 ** -3)#convert mm to meters
@@ -250,16 +260,17 @@ def hand_properties(frame):
     else:
         #we need to average them out
         avg_finger_dir = average_direction(directions=fingers)
-    print(hand.fingers[0].direction)
-    #position = (x,y,z,) #in millimeters
+    #print(hand.fingers[0].direction)
+    
     velocity = hand.palm_velocity
     normal_vector = hand.palm_normal
-
+    finger_x, finger_y, finger_z = avg_finger_dir
     pitch = hand.direction.pitch# x axis angle
     yaw = hand.direction.yaw# y axis
     roll = hand.palm_normal.roll#z axis relative to normal_vector
     # return position, pitch, yaw, roll
-    return x, y, z, pitch, yaw, roll,
+    finger_yaw = math.atan(finger_y/finger_x)
+    return x, y, z, pitch, yaw, roll, finger_yaw
 
 def finger_properties(hand):
     finger_x, finger_y, finger_z = hand.fingers[0].direction
@@ -269,7 +280,7 @@ def convert_to_joints(properties):
     if len(properties)  < 6 :
         raise ValueError("Not a valid property structure!\n\n")
 
-    x,y,z,pitch,yaw,roll = properties
+    x,y,z,pitch,yaw,roll, finger_yaw = properties
 
     if properties[0] != 0:
         y_x_scaling = properties[1] / properties[0]# y / x
@@ -281,13 +292,16 @@ def convert_to_joints(properties):
     joint_1 = roll #joint 1 - base (X-Z axis)
 
     joint_2 = pitch#yaw * y_x_scaling #_yaw | main vertical trunk XY rotation
-    joint_3 = yaw * y_x_scaling# top joint XY plane rotation
-    joint_4 = roll #distance of x-z| X-Z arm
-    joint_5 = pitch #XY plane of hand
+    joint_3 = finger_yaw * y_x_scaling# top joint XY plane rotation
+    joint_4 = roll * distance_x_z#distance of x-z| X-Z arm
+    joint_5 = pitch * y #XY plane of hand
     #joint_5 = roll * distance_x_z#these two are the hand
     joint_6 = yaw#this one is wrist rotation
 
-    print("X: %f | Y: %f | Z: %f | Palm-Pitch: %f | Palm-Yaw: %f | Palm-Roll: %f"%(x,y,z,pitch,yaw,roll))
+    print("|Hand Properties|\n")
+    print("X: %f | Y: %f | Z: %f |\n Palm-Pitch: %f | Palm-Yaw: %f | Palm-Roll: %f |\n Finger Yaw:%f|\n\n"%(x,y,z,pitch,yaw,roll, finger_yaw))
+    
+    print("|Joint Conversions|\n")
     print("J1: %f | J2: %f | J3: %f | J4: %f | J5: %f | J6: %f\n\n"%(x,y,z,pitch,yaw,roll))
     return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6,
 
