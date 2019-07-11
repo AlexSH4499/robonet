@@ -23,7 +23,7 @@ import Leap, time
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 from LeapResponse import send_response
 
-FRAME_BUFFER_LIM = 60
+FRAME_BUFFER_LIM = 1
 
 class HandFrame:
 
@@ -47,20 +47,81 @@ class HandFrame:
 
 class RobotStructure:
 
-    def __init__(self, name=""):
+    def __init__(self,uid=0, name=""):
+        self.uid = uid
         self.name = name
-        self.joints = (('joint_1',0.0),('joint_2',0.0),
-                        ('joint_3',0.0),('joint_4',0.0),
-                        ('joint_5',0.0),('joint_6',0.0),)
+        #self.joints = OrderedDict([('joint_1',0.0),('joint_2',0.0),
+        #                            ('joint_3',0.0),('joint_4',0.0),
+        #                            ('joint_5',0.0),('joint_6',0.0)])
+        self._joints = OrderedDict(self.joints_default_position())
         return
 
+    def joints_default_position(self):
+        return zip(self.str_joints(), [0.0 for num in range(len([self.str_joints()]))])
+
+    def joints_limits(self):
+        num_lims = zip(self.joint_mins, self.joint_maxs)
+        # limits = OrderedDict({'joint_1':(-3.053,3.053),'joint_2':(-1.919,0.639),'joint_3':(-1.396,1.57),
+                        # 'joint_4':(-3.053,3.053),'joint_5':(-1.744, 1.919),'joint_6':(-2.573,2.573)})
+        limits = OrderedDict(zip(self.str_joints(), num_lims))
+        for k,v in limits.items():
+            yield k,v 
+
     def joints(self):
-        for joint in self.joints:
+        # for joint in self._joints.items():
+        #     yield joint
+        return self._joints
+
+    def joint_mins(self):
+        mins = [-3.053, -1.919,-1.396,-3.053,-1.744, -2.573]
+        for min in mins:
+            yield min
+
+    def joint_maxs(self):
+        maxs = [3.053, 0.639, 1.57, 3.053, 1.919, 2.573]
+        for max in maxs:
+            yield max
+
+    def str_joints(self):
+        joints_str = ['joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
+        for joint in joints_str:
             yield joint
+
+    def update_joint(self, updated_joint={}):
+        key, value = updated_joint.keys(), updated_joint.values()
+        value = self.assert_joint_limits( key, value)
+        self.joints().update(key,value)
+        return 
+    
+    def max_of_joint(self, min_max_tuple=tuple()):
+        if len(min_max_tuple) > 2 or len(min_max_tuple) < 2:
+            raise ValueError("Min Max Tuple was not properly initialized!\n\n")
+        return min_max_tuple[1]
+    
+    def min_of_joint(self, min_max_tuple=tuple()):
+        if len(min_max_tuple) > 2 or len(min_max_tuple) < 2:
+            raise ValueError("Min Max Tuple was not properly initialized!\n\n")
+        return min_max_tuple[0]
+
+    def assert_joint_limits(self, joint, value):
+        lims = [self.joints_limits()]
+        if value > self.max_of_joint(lims[joint]):
+            return self.max_of_joint(lims[joint])
+        
+        if value <  self.min_of_joint(lims[joint]):
+            return self.min_of_joint(lims[joint])
+        return value
 
     def __len__(self):
         return len(self.joints) #should be 6 here but must verify this works
 
+    #we need to fix this, somehow idk...
+    def __str__(self):
+        str_robot = 'UID:{}\t|\tName:{}\n'.format(self.uid, self.name)
+        # for k,v in [self.joints()]:
+        #     str_robot.append('|{} : {}|\t'.format(k , v))
+        # str_robot.append('\n')
+        return str_robot
 
 class RobotData(OrderedDict):
 
@@ -87,6 +148,7 @@ class CustomListener(Leap.Listener):
 
     def __init__(self):
         self.i = 0
+        self.robot = RobotStructure(uid=1 , name="Alpha")
         super(CustomListener, self).__init__()
         self.buffer = []
         return
@@ -96,10 +158,10 @@ class CustomListener(Leap.Listener):
         self.clamp = 0
 
     '''UPDATE THESE VARIABLE NAMES, THEY'RE WRONG!'''
-    def averaged_position(self, frame_list):
+    def averaged_position(self, positions):
         _x,_y,_z,_pitch,_roll,_yaw = 0, 0, 0, 0, 0, 0
-        # print(frame_list)
-        for x,y,z,pitch,roll,yaw in frame_list:
+        # print(position)
+        for x,y,z,pitch,roll,yaw in positions:
             _x += x
             _y += y
             _z += z
@@ -107,18 +169,18 @@ class CustomListener(Leap.Listener):
             _roll +=roll
             _pitch += pitch
 
-        if len(frame_list) > 0:
-            _x /= len(frame_list)
-            _y /= len(frame_list)
-            _z /= len(frame_list)
-            _yaw /= len(frame_list)
-            _roll /= len(frame_list)
-            _pitch /= len(frame_list)
+        if len(positions) > 0:
+            _x /= len(positions)
+            _y /= len(positions)
+            _z /= len(positions)
+            _yaw /= len(positions)
+            _roll /= len(positions)
+            _pitch /= len(positions)
         return _x,_y,_z,_pitch,_roll,_yaw
 
     def default_data(self):
-         robot, executed, uid = 1 , False, self.i
-         values = [uid,robot, executed]
+        robot, executed, uid = self.robot.uid , False, self.i
+        values = [uid,robot, executed]
         return values
 
     def frame_buffer(self,frame):
@@ -128,7 +190,7 @@ class CustomListener(Leap.Listener):
         for val in position:
             values.append(str(round(val,2)))
 
-        data = OrderedDict(zip(params,values))#preserve the order of the joints
+        joint_data = OrderedDict(zip(params,values))#preserve the order of the joints
                                               #otherwise, our RESTAPI breaks due to values getting displaced
         
         if len(self.buffer) >= FRAME_BUFFER_LIM:# length of buffer is or exceeds our global limit
@@ -136,21 +198,21 @@ class CustomListener(Leap.Listener):
             # with open("BUFFERED.txt","a+") as f:
             #     st = str(avg) + '\n'
             #     f.write(st)
-            resp = send_response(uid=uid, data=data)#send our averaged data to REST API
+            resp = send_response(uid=values[0], data=joint_data)#send our averaged data to REST API
             #print(resp.json)
             #print(resp.headers)
-            print('\n\n\n\n\n')
+            print('Exited\n\n\n\n\n')
             self.i = self.i + 1
 
             while len(self.buffer) > 0:
                 self.buffer.pop()#empty our buffer
-        else:
-            self.buffer.append(frame)#add frame to buffer
+        
+        self.buffer.append(frame)#add frame to buffer
         avg = self.averaged_position(self.buffer)
         return avg
 
     def on_connect(self, controller):
-        print( "Connected\n\n")
+        print( "Connected...\n\n")
         # Enable gestures
 #        controller.enable_gesture(Leap.Gesture.TYPE_CIRCLE);
  #       controller.enable_gesture(Leap.Gesture.TYPE_KEY_TAP);
@@ -176,22 +238,35 @@ class CustomListener(Leap.Listener):
             if not frame.hands.is_empty:
                 # Get the first hand
                 hand = frame.hands[0]
-                x,y,z, pitch, yaw, roll = assert_limits(convert_to_joints(hand_properties(frame)))#not really x,y,z anynmore, now its joints
+                #x,y,z, pitch, yaw, roll = assert_limits(convert_to_joints(hand_properties(frame)))#not really x,y,z anynmore, now its joints
+                
+                #joint_1, joint_2, joint_3, joint_4,joint_5, joint_6 = convert_to_joints(hand_properties(frame))
+                str_joints = self.robot.str_joints()
+                current_joints =  zip(str_joints, convert_to_joints(hand_properties(frame)))#data received from Leap Motion
+                #print("Current joints:{}\n".format(current_joints))
+                for joint, val in current_joints:
+                    di = {joint:val}
+                    self.robot.joints().update(di)#Update our internal RobotStructure Object, automatically handles our joints' limits 
+                    # print("Robot joints:{}\n\n".format(self.robot.joints()))
                 # print(x,y,z,pitch,yaw,roll)
                 # print(len(hand.palm_position))
 
 
-                hand_props.append(x)
-                hand_props.append(y)
-                hand_props.append(z)
-                # hand_props.append(pitch* Leap.RAD_TO_DEG)# x rotation degrees
-                # hand_props.append(yaw* Leap.RAD_TO_DEG)#y rotation degrees
-                # hand_props.append(roll* Leap.RAD_TO_DEG)# z rotation degrees
-                hand_props.append(pitch)# x rotation rads
-                hand_props.append(yaw)#y rotation rads
-                hand_props.append(roll)# z rotation rads
+                # hand_props.append(x)
+                # hand_props.append(y)
+                # hand_props.append(z)
+                # # hand_props.append(pitch* Leap.RAD_TO_DEG)# x rotation degrees
+                # # hand_props.append(yaw* Leap.RAD_TO_DEG)#y rotation degrees
+                # # hand_props.append(roll* Leap.RAD_TO_DEG)# z rotation degrees
+                # hand_props.append(pitch)# x rotation rads
+                # hand_props.append(yaw)#y rotation rads
+                # hand_props.append(roll)# z rotation rads
+                for val in self.robot.joints().values():
+                    # print("value being added to props:{}\n".format(val))
+                    hand_props.append(val)
                 # print(hand_props)
-
+            # print("\n\n")
+            # print("Hand Props:{}\n\n".format(hand_props))
             # print "%f seconds" % (time.time() - start)
             averaged_position = self.frame_buffer(tuple(hand_props))
 
@@ -222,10 +297,10 @@ class CustomListener(Leap.Listener):
     #     self.controller.remove_listener(self)
     #     return
 
-def joint_limits():
-    limits = OrderedDict({'joint_1':(-3.053,3.053),'joint_2':(-1.919,0.639),'joint_3':(-1.396,1.57),
-                        'joint_4':(-3.053,3.053),'joint_5':(-1.744, 1.919),'joint_6':(-2.573,2.573)})
-    return limits
+# def joint_limits():
+#     limits = OrderedDict({'joint_1':(-3.053,3.053),'joint_2':(-1.919,0.639),'joint_3':(-1.396,1.57),
+#                         'joint_4':(-3.053,3.053),'joint_5':(-1.744, 1.919),'joint_6':(-2.573,2.573)})
+#     return limits
 
 def average_direction(directions):
     sum_x= 0
@@ -269,11 +344,16 @@ def hand_properties(frame):
     yaw = hand.direction.yaw# y axis
     roll = hand.palm_normal.roll#z axis relative to normal_vector
     # return position, pitch, yaw, roll
-    finger_yaw = math.atan(finger_y/finger_x)
+    finger_yaw = 0
+    if finger_x != 0:
+        finger_yaw = math.atan(finger_y/finger_x)
+    
     return x, y, z, pitch, yaw, roll, finger_yaw
 
 def finger_properties(hand):
-    finger_x, finger_y, finger_z = hand.fingers[0].direction
+    #print(hand.fingers[0]+'\n')
+    #finger_x, finger_y, finger_z = hand.fingers[0].direction
+    finger_x, finger_y, finger_z = 0,0,0
     return finger_x, finger_y, finger_z
 
 def convert_to_joints(properties):
@@ -306,51 +386,51 @@ def convert_to_joints(properties):
     return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6,
 
 #joints = ['joint_1','joint_2','joint_3','joint_4','joint_5','joint_6']
-def assert_limits(converted_joints):
+# def assert_limits(converted_joints):
 
-    joint_1,joint_2,joint_3,joint_4,joint_5,joint_6 = converted_joints
-    lims = joint_limits()
+#     joint_1,joint_2,joint_3,joint_4,joint_5,joint_6 = converted_joints
+#     lims = joint_limits()
 
-    #minimums
-    if joint_1 < lims['joint_1'][0]:
-        joint_1 = lims['joint_1'][0]
+#     #minimums
+#     if joint_1 < lims['joint_1'][0]:
+#         joint_1 = lims['joint_1'][0]
 
-    if joint_2 < lims['joint_2'][0]:
-        joint_2 = lims['joint_2'][0]
+#     if joint_2 < lims['joint_2'][0]:
+#         joint_2 = lims['joint_2'][0]
 
-    if joint_3 < lims['joint_3'][0]:
-        joint_3 = lims['joint_3'][0]
+#     if joint_3 < lims['joint_3'][0]:
+#         joint_3 = lims['joint_3'][0]
 
-    if joint_4 < lims['joint_4'][0]:
-        joint_4 = lims['joint_4'][0]
+#     if joint_4 < lims['joint_4'][0]:
+#         joint_4 = lims['joint_4'][0]
 
-    if joint_5 < lims['joint_5'][0]:
-        joint_5 = lims['joint_5'][0]
+#     if joint_5 < lims['joint_5'][0]:
+#         joint_5 = lims['joint_5'][0]
 
-    if joint_6 < lims['joint_6'][0]:
-        joint_6 = lims['joint_6'][0]
+#     if joint_6 < lims['joint_6'][0]:
+#         joint_6 = lims['joint_6'][0]
 
-    #maximums
-    if joint_1 > lims['joint_1'][1]:
-        joint_1 = lims['joint_1'][1]
+#     #maximums
+#     if joint_1 > lims['joint_1'][1]:
+#         joint_1 = lims['joint_1'][1]
 
-    if joint_2 > lims['joint_2'][1]:
-        joint_2 = lims['joint_2'][1]
+#     if joint_2 > lims['joint_2'][1]:
+#         joint_2 = lims['joint_2'][1]
 
-    if joint_3 > lims['joint_3'][1]:
-        joint_3 = lims['joint_3'][1]
+#     if joint_3 > lims['joint_3'][1]:
+#         joint_3 = lims['joint_3'][1]
 
-    if joint_4 > lims['joint_4'][1]:
-        joint_4 = lims['joint_4'][1]
+#     if joint_4 > lims['joint_4'][1]:
+#         joint_4 = lims['joint_4'][1]
 
-    if joint_5 > lims['joint_5'][1]:
-        joint_5 = lims['joint_5'][1]
+#     if joint_5 > lims['joint_5'][1]:
+#         joint_5 = lims['joint_5'][1]
 
-    if joint_6 > lims['joint_6'][1]:
-        joint_6 = lims['joint_6'][1]
+#     if joint_6 > lims['joint_6'][1]:
+#         joint_6 = lims['joint_6'][1]
 
 
-    return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6
+#     return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6
 
 def main():
 
