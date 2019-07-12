@@ -227,23 +227,13 @@ class CustomListener(Leap.Listener):
 
                 str_joints = self.robot.str_joints()
                 current_joints =  zip(str_joints, convert_to_joints(hand_properties(frame)))#data received from Leap Motion
-                #print("Current joints:{}\n".format(current_joints))
                 
                 for joint, val in current_joints:
-
-                    di = {joint:val}
-                    #This Line is not executing for whatever reason
-                    #print(self.robot._joints.update(di))#Update our internal RobotStructure Object, automatically handles our joints' limits 
-                    self.robot.update_joint(updated_joint=di)
-                    print("Robot joints:{}\n\n".format(self.robot.joints()))
+                    self.robot.update_joint(updated_joint={joint:val})
 
                 for val in self.robot.joints().values():
-                    # print("value being added to props:{}\n".format(val))
                     hand_props.append(val)
-                # print(hand_props)
-            # print("\n\n")
-            # print("Hand Props:{}\n\n".format(hand_props))
-            # print "%f seconds" % (time.time() - start)
+
             averaged_position = self.frame_buffer(tuple(hand_props))
 
             #Empty out the props for next frame
@@ -365,8 +355,6 @@ def main():
 
     # Have the sample listener receive events from the controller
     controller.add_listener(listener)
-    #print "here"
-    #sys.exit()
     # Keep this process running until Enter is pressed
     print("Press Enter to quit...")
     sys.stdin.readline()
