@@ -1,6 +1,6 @@
 
 
-ROBOT_IP_ADDRESS = '192.168.1.36'
+ROBOT_IP_ADDRESS = '192.168.1.27'#OR 36
 USER= 'niryo'
 PASS = 'robotics'
 
@@ -35,6 +35,8 @@ import paramiko
 from paramiko.py3compat import input
 
 
+REMOTE_LIBRARY_DIR = "/home/niryo/catkin_ws/devel/"
+NIRYO_API_SCRIPT = "niryo_one_example_python_api.py"
 # setup logging
 paramiko.util.log_to_file("demo_sftp.log")
 
@@ -98,7 +100,7 @@ def host_key_and_type(hostkeytype=None, hostkey=None):
     return hostkeytype, hostkey
 
 
-def send_file(hostname=ROBOT_IP_ADDRESS, hostkey=None, username="niryo", password="robotics", file_to_send="demo_sftp.py", directory="demo_sftp_folder"):
+def send_file(hostname=ROBOT_IP_ADDRESS, hostkey=None, username=USER, password=PASS, file_to_send=NIRYO_API_SCRIPT, directory=REMOTE_LIBRARY_DIR):
     t = paramiko.Transport((hostname, Port))
     t.connect(hostkey, username,   password,)
     sftp = paramiko.SFTPClient.from_transport(t)
@@ -118,7 +120,8 @@ def send_file(hostname=ROBOT_IP_ADDRESS, hostkey=None, username="niryo", passwor
 def connect():
     # now, connect and use paramiko Transport to negotiate SSH2 across the connection
     try:
-        send_file(hostname=ROBOT_IP_ADDRESS, hostkey=None, username="niryo",password="robotics", file_to_send="niryo_one_example_python_api.py",directory="/home/niryo/catkin_ws/devel/")
+        send_file(hostname=ROBOT_IP_ADDRESS, hostkey=None, username=USER,password=PASS,
+                 file_to_send=NIRYO_API_SCRIPT,directory=REMOTE_LIBRARY_DIR)
     except Exception as e:
         print("*** Caught exception: %s: %s" % (e.__class__, e))
         traceback.print_exc()
@@ -128,5 +131,4 @@ def connect():
 
 
 if __name__ == '__main__':
-
     connect()

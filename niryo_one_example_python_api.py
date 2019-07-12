@@ -112,8 +112,10 @@ def debugging():
                     #update database
                     requests.put(API_ROOT + str(data['uid']) + '/',
                                         data=data,auth=('mec123','mec123'))
-            print("Ending cycle of requests...\n")
-            time.sleep(.250)
+                json_data = []
+                original_data = []
+        
+           
     except KeyboardInterrupt:
         print("Niryo Session Terminated\n\n")
     return
