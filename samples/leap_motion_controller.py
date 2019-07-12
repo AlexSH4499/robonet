@@ -98,10 +98,10 @@ class RobotStructure:
     def assert_joint_limits(self, joint, value):
         lims = {k:v for k,v in self.joints_limits()}
         if value > self.max_of_joint(lims[joint]):
-            return self.max_of_joint(lims[joint])
+            return math.floor(round(self.max_of_joint(lims[joint]), ndigits=2))
         
         if value <  self.min_of_joint(lims[joint]):
-            return self.min_of_joint(lims[joint])
+            return math.floor(round(self.min_of_joint(lims[joint]), ndigits=2))
 
         return value
 
