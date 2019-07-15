@@ -8,7 +8,7 @@ import json
 import requests
 
 #API ADDRESS
-API_ROOT = 'http://192.168.1.21:8000/requests/'#works as tested on Niryo robot
+API_ROOT = 'http://192.168.1.33:8000/requests/'#works as tested on Niryo robot
 #ask for data by maintaining a request open
 
 

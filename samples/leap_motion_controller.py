@@ -25,6 +25,9 @@ from LeapResponse import send_response
 
 FRAME_BUFFER_LIM = 1
 
+def truncate(num, digs):
+    return math.trunc(10** digs * num)/ 10**digs
+
 class HandFrame:
 
     def __init__(self, x,y,z,pitch, yaw,roll):
@@ -96,12 +99,16 @@ class RobotStructure:
         return min_max_tuple[0]
 
     def assert_joint_limits(self, joint, value):
-        lims = {k:v for k,v in self.joints_limits()}
-        if value > self.max_of_joint(lims[joint]):
-            return math.floor(round(self.max_of_joint(lims[joint]), ndigits=2))
         
-        if value <  self.min_of_joint(lims[joint]):
-            return math.floor(round(self.min_of_joint(lims[joint]), ndigits=2))
+        lims = {k:v for k,v in self.joints_limits()}
+        max = self.max_of_joint(lims[joint])
+        min = self.min_of_joint(lims[joint])
+
+        if value > max:
+            return math.floor(truncate(max, digs=2))
+        
+        if value < min :
+            return math.floor(truncate(min, digs=2))
 
         return value
 
@@ -328,16 +335,24 @@ def convert_to_joints(properties):
     else:
         y_x_scaling = 1
     distance_x_z = math.sqrt(x ** 2 + z**2)
-
+    distance_org = math.sqrt(x ** 2 + y ** 2 +z**2)
     # we should validate that the values are within params
-    joint_1 = roll #joint 1 - base (X-Z axis)
+    # joint_1 = roll #joint 1 - base (X-Z axis)
 
-    joint_2 = pitch#yaw * y_x_scaling #_yaw | main vertical trunk XY rotation
-    joint_3 = finger_yaw # top joint XY plane rotation
-    joint_4 = roll #distance of x-z| X-Z arm
-    joint_5 = pitch #XY plane of hand
+    # joint_2 = pitch#yaw * y_x_scaling #_yaw | main vertical trunk XY rotation
+    # joint_3 = finger_yaw # top joint XY plane rotation
+    # joint_4 = roll #distance of x-z| X-Z arm
+    # joint_5 = pitch #XY plane of hand
+    # #joint_5 = roll * distance_x_z#these two are the hand
+    # joint_6 = distance_org#this one is wrist rotation
+
+    joint_1 = 0#base motor
+    joint_2 = 0.6777#yaw * y_x_scaling #_yaw | main vertical trunk XY rotation
+    joint_3 = 0 # top joint XY plane rotation
+    joint_4 = 0 #distance of x-z| X-Z arm
+    joint_5 = 0 #XY plane of hand
     #joint_5 = roll * distance_x_z#these two are the hand
-    joint_6 = yaw#this one is wrist rotation
+    joint_6 = 0#this one is wrist rotation
 
     print("|Hand Properties|\n")
     print("\tX: %f | Y: %f | Z: %f |\n Palm-Pitch: %f | Palm-Yaw: %f | Palm-Roll: %f |\n Finger Yaw:%f|\n\n"%(x,y,z,pitch,yaw,roll, finger_yaw))
@@ -366,10 +381,18 @@ def main():
 if __name__ == "__main__":
     main()
 
-import unittest
+# import unittest
 
-class RobotTest(unittest.TestCase):
+# class RobotTest(unittest.TestCase):
 
-    def test_len(self):
-        robot = RobotStructure()
-        self.assertTrue(len(robot) == 6)
+#     def test_len(self):
+#         robot = RobotStructure()
+#         self.assertTrue(len(robot) == 6)
+
+#     from hypothesis import given
+#     from hypothesis.strategies import floats
+
+#     @given(value=floats())
+#     def test_lims(self, value, robot=RobotStructure()):
+#         assert robot.assert_joint_limits('joint_1', value) == truncate(robot.joints_limits()['joint_1'],2)
+       
