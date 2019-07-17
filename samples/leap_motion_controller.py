@@ -1,20 +1,21 @@
 #!/usr/bin/env python
 import sys,os,inspect
-import math
+import math, decimal
+from decimal import ROUND_DOWN, ROUND_UP
 
-from collections import OrderedDict
+from collections import OrderedDict 
 
 '''This Logic is so we can add the LEAP SDK to our PATH/ENVIRONMENT_VARIABLE'''
 
 print(sys.path.insert(0,'C:\\LeapDeveloperKit_2.3.1+31549_win\\LeapSDK\\lib\\x64'))
 
-#print(sys.path.insert(0,'C:\\Leap_Motion_Developer_Kit_4.0.0+52173\\LeapSDK\\lib'))
 print(sys.path.insert(0,'C:\\LeapDeveloperKit_2.3.1+31549_win\\LeapSDK\\lib'))
-#sys.path.insert(0,'C:\\Users\\Test User\\Downloads\\Leap_Motion_SDK_Windows_2.3.1\\LeapDeveloperKit_2.3.1+31549_win\\LeapSDK\\lib')
+
 src_dir = os.path.dirname(inspect.getfile(inspect.currentframe()))
 print(src_dir)
 arch_dir = '../lib/x64'
 sys.path.insert(0, os.path.abspath(os.path.join(src_dir, arch_dir)))
+
 '''
 This should be abstracted and separated into it's own logic and file
 '''
@@ -89,26 +90,35 @@ class RobotStructure:
         return 
     
     def max_of_joint(self, min_max_tuple=tuple()):
-        if len(min_max_tuple) > 2 or len(min_max_tuple) < 2:
+        if len(min_max_tuple) != 2:
             raise ValueError("Min Max Tuple was not properly initialized!\n\n")
         return min_max_tuple[1]
     
     def min_of_joint(self, min_max_tuple=tuple()):
-        if len(min_max_tuple) > 2 or len(min_max_tuple) < 2:
+        if len(min_max_tuple) != 2 :
             raise ValueError("Min Max Tuple was not properly initialized!\n\n")
         return min_max_tuple[0]
 
     def assert_joint_limits(self, joint, value):
-        
+        decimal.getcontext().prec=2
+
         lims = {k:v for k,v in self.joints_limits()}
         max = self.max_of_joint(lims[joint])
         min = self.min_of_joint(lims[joint])
 
         if value > max:
-            return math.floor(truncate(max, digs=2))
+            print("Value:{}\t was greater than {}\n".format(value, max))
+            decimal.getcontext().rounding = ROUND_DOWN
+            val = float("{0:.2f}".format(max))
+            print("Rounded max:{}\n\n".format(val))
+            return val
         
         if value < min :
-            return math.floor(truncate(min, digs=2))
+            print("Value:{}\t was less than {}\n".format(value, min))
+            decimal.getcontext().rounding = ROUND_UP
+            val = float("{0:.2f}".format(min))
+            print("Rounded min:{}\n\n".format(val))
+            return val
 
         return value
 
@@ -118,7 +128,7 @@ class RobotStructure:
     #we need to fix this, somehow idk...
     def __str__(self):
         str_robot = ['UID:',self.uid,'\t|\tName:',self.name,'\n']
-        str_joints = ['|'+str(k)+':' +str(v) + '|\t' for k,v in self.joints()]
+        str_joints = ['|'+str(k)+':' +str(v) + '|\t' for k, v in self.joints()]
         return str(str_robot) + str(str_joints)
 
 class RobotData(OrderedDict):
@@ -126,10 +136,11 @@ class RobotData(OrderedDict):
     def __init__(self, values):
 
         self.params = ('uid','robot_to_send','executed',
-                    'joint_1','joint_2','joint_3',
-                    'joint_4','joint_5','joint_6')
+                        'joint_1','joint_2','joint_3',
+                        'joint_4','joint_5','joint_6')
         self.values = values
         return
+
     def __params_to_remove(self):
         return ('uid','robot_to_send','executed',)
 
@@ -157,8 +168,9 @@ class CustomListener(Leap.Listener):
 
     '''UPDATE THESE VARIABLE NAMES, THEY'RE WRONG!'''
     def averaged_position(self, positions):
+        
         _x,_y,_z,_pitch,_roll,_yaw = 0, 0, 0, 0, 0, 0
-        # print(position)
+
         for x,y,z,pitch,roll,yaw in positions:
             _x += x
             _y += y
@@ -174,7 +186,8 @@ class CustomListener(Leap.Listener):
             _yaw /= len(positions)
             _roll /= len(positions)
             _pitch /= len(positions)
-        return _x,_y,_z,_pitch,_roll,_yaw
+
+        return _x, _y, _z, _pitch, _roll, _yaw
 
     def default_data(self):
         robot, executed, uid = self.robot.uid , False, self.i
@@ -192,18 +205,12 @@ class CustomListener(Leap.Listener):
                                               #otherwise, our RESTAPI breaks due to values getting displaced
         
         if len(self.buffer) >= FRAME_BUFFER_LIM:# length of buffer is or exceeds our global limit
-            print("Entered The BUFFER LOGiC\n\n\n")
-            # with open("BUFFERED.txt","a+") as f:
-            #     st = str(avg) + '\n'
-            #     f.write(st)
+            print("==Entered The BUFFER LOGIC==\n\n\n")
             resp = send_response(uid=values[0], data=joint_data)#send our averaged data to REST API
-            #print(resp.json)
-            #print(resp.headers)
-            print('Exited\n\n\n\n\n')
+            print('===========Exited===========\n\n\n\n\n')
             self.i = self.i + 1
 
-            while len(self.buffer) > 0:
-                self.buffer.pop()#empty our buffer
+            self.__empty(self.buffer)#empty our buffer
         
         self.buffer.append(frame)#add frame to buffer
         avg = self.averaged_position(self.buffer)
@@ -223,6 +230,13 @@ class CustomListener(Leap.Listener):
 
     def on_exit(self, controller):
         print("Exited\n\n")
+    
+    def __empty(self, li=[]):
+        if not isinstance(li, list):
+            raise ValueError('Not an instance of a list.')
+        while len(li) > 0:
+            li.pop()
+        return li
 
     def on_frame(self, controller):
 
@@ -244,8 +258,9 @@ class CustomListener(Leap.Listener):
             averaged_position = self.frame_buffer(tuple(hand_props))
 
             #Empty out the props for next frame
-            while len(hand_props):
-                hand_props.pop()
+            self.__empty(hand_props)
+
+        return 
 
     def state_string(self, state):
         if state == Leap.Gesture.STATE_START:
@@ -269,9 +284,8 @@ class CustomListener(Leap.Listener):
     #     return
 
 def average_direction(directions):
-    sum_x= 0
-    sum_y = 0
-    sum_z = 0
+    sum_x, sum_y, sum_z = 0, 0, 0
+    
 
     for dir in directions:
         x,y,z = dir
@@ -309,7 +323,7 @@ def hand_properties(frame):
     pitch = hand.direction.pitch# x axis angle
     yaw = hand.direction.yaw# y axis
     roll = hand.palm_normal.roll#z axis relative to normal_vector
-    # return position, pitch, yaw, roll
+
     finger_yaw = 0
     if finger_x != 0:
         finger_yaw = math.atan(finger_y/finger_x)
@@ -328,38 +342,29 @@ def convert_to_joints(properties):
     if len(properties)  < 6 :
         raise ValueError("Not a valid property structure!\n\n")
 
-    x,y,z,pitch,yaw,roll, finger_yaw = properties
+    x, y, z, pitch, yaw, roll, finger_yaw = properties
 
     if properties[0] != 0:
         y_x_scaling = properties[1] / properties[0]# y / x
     else:
         y_x_scaling = 1
+
     distance_x_z = math.sqrt(x ** 2 + z**2)
     distance_org = math.sqrt(x ** 2 + y ** 2 +z**2)
     # we should validate that the values are within params
-    # joint_1 = roll #joint 1 - base (X-Z axis)
-
-    # joint_2 = pitch#yaw * y_x_scaling #_yaw | main vertical trunk XY rotation
-    # joint_3 = finger_yaw # top joint XY plane rotation
-    # joint_4 = roll #distance of x-z| X-Z arm
-    # joint_5 = pitch #XY plane of hand
-    # #joint_5 = roll * distance_x_z#these two are the hand
-    # joint_6 = distance_org#this one is wrist rotation
-
-    joint_1 = 0#base motor
-    joint_2 = 0.6777#yaw * y_x_scaling #_yaw | main vertical trunk XY rotation
-    joint_3 = 0 # top joint XY plane rotation
-    joint_4 = 0 #distance of x-z| X-Z arm
-    joint_5 = 0 #XY plane of hand
-    #joint_5 = roll * distance_x_z#these two are the hand
-    joint_6 = 0#this one is wrist rotation
+    joint_1 = pitch #joint 1 - base (X-Z axis)#XZ Plane Rotation | base motor
+    joint_2 = yaw #_yaw | main vertical trunk XY rotation
+    joint_3 = finger_yaw # top joint XY plane rotation
+    joint_4 = roll#| X-Z arm |
+    joint_5 = yaw #XY plane of  rotation of hand
+    joint_6 = roll# wrist  Joint in XZ plane 
 
     print("|Hand Properties|\n")
     print("\tX: %f | Y: %f | Z: %f |\n Palm-Pitch: %f | Palm-Yaw: %f | Palm-Roll: %f |\n Finger Yaw:%f|\n\n"%(x,y,z,pitch,yaw,roll, finger_yaw))
     
     print("|Joint Conversions|\n")
     print("\tJ1: %f | J2: %f | J3: %f | J4: %f | J5: %f | J6: %f\n\n"%(x,y,z,pitch,yaw,roll))
-    return joint_1,joint_2,joint_3,joint_4,joint_5,joint_6,
+    return joint_1, joint_2, joint_3, joint_4, joint_5, joint_6,
 
 
 def main():

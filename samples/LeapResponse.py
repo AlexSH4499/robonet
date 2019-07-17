@@ -4,7 +4,7 @@ import requests
 # export DJANGO_SETTINGS_MODULE=RESTAPI.settings
 #Found in: https://stackoverflow.com/questions/26082128/improperlyconfigured-you-must-either-define-the-environment-variable-django-set
 #Api address
-API_ADDRESS = 'http://192.168.1.33:8000/requests/'
+API_ADDRESS = 'http://192.168.1.29:8000/requests/'#default is supposed to be the PC's current ip address, should really abstract this out but whatever
 
 def dummy_data():
     data = {'uid':10,
@@ -30,7 +30,7 @@ def send_response(uid=0, data={}):
     req = requests.post(API_ADDRESS+str(uid)+'/' , auth=('mec123','mec123'), json=data)
     # print(req.url)
     # print(req.data)
-    # print(req.json  )
+    # print(req.json )
     return req
 
 def main():
