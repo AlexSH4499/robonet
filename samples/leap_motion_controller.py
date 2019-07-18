@@ -1,7 +1,11 @@
 #!/usr/bin/env python
+
+#Reference used for Decimal rounding problem
+#https://stackoverflow.com/questions/29246455/python-setting-decimal-place-range-without-rounding
+
 import sys,os,inspect
-import math, decimal
-from decimal import ROUND_DOWN, ROUND_UP
+import math, decimal  
+from decimal import ROUND_DOWN, ROUND_UP, Decimal
 
 from collections import OrderedDict 
 
@@ -103,19 +107,19 @@ class RobotStructure:
         decimal.getcontext().prec=2
 
         lims = {k:v for k,v in self.joints_limits()}
-        max = self.max_of_joint(lims[joint])
-        min = self.min_of_joint(lims[joint])
+        max = Decimal(self.max_of_joint(lims[joint]))
+        min = Decimal(self.min_of_joint(lims[joint]))
 
         if value > max:
-            print("Value:{}\t was greater than {}\n".format(value, max))
+            print("Value:{}\t was greater than max:{}\n".format(value, max))
             decimal.getcontext().rounding = ROUND_DOWN
             val = float("{0:.2f}".format(max))
             print("Rounded max:{}\n\n".format(val))
             return val
         
         if value < min :
-            print("Value:{}\t was less than {}\n".format(value, min))
-            decimal.getcontext().rounding = ROUND_UP
+            print("Value:{}\t was less than min:{}\n".format(value, min))
+            decimal.getcontext().rounding = ROUND_DOWN
             val = float("{0:.2f}".format(min))
             print("Rounded min:{}\n\n".format(val))
             return val
@@ -307,7 +311,7 @@ def hand_properties(frame):
     x = hand.palm_position[0] * (10 ** -3)#convert mm to meters
     y = hand.palm_position[1] * (10 ** -3)#convert mm to meters
     z = hand.palm_position[2] * (10 ** -3)#convert mm to meters
-    avg_finger_dir = 1
+    avg_finger_dir = 1,1 ,1
     finger = hand.fingers[0]
     if len(fingers) < FRAME_BUFFER_LIM:
         fingers.append(finger_properties(finger))
