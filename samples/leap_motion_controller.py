@@ -162,7 +162,7 @@ class RobotData(OrderedDict):
                      
 # params = [ 'uid','robot_to_send','executed',
 #             'joint_1','joint_2','joint_3',
-#             'joint_4','joint_5','joint_6']#This being removes causes a problem on line 208, should consider making it use robot params itself
+#             'joint_4','joint_5','joint_6']#This being removed causes a problem on line 208, should consider making it use robot params itself
 
 IP_ADDRESS = '192.168.1.29'
 PORT='8000'
@@ -171,11 +171,12 @@ ADMIN='mec123'
 PASS='mec123'
 class CustomListener(Leap.Listener):
 
-    def __init__(self):
+    def __init__(self, ip=IP_ADDRESS, port=PORT,api=API_ADDRESS,user=ADMIN,passw=PASS):
         self.i = 0
         self.robot = RobotStructure(uid=1 , name="Alpha")
         super(CustomListener, self).__init__()
         self.buffer = []
+        self.call_handler = API_CALL_HANDLER(ip=ip, port=port, api=api,user=user, passw=passw)
         return
 
     def on_init(self, controller):
@@ -222,8 +223,8 @@ class CustomListener(Leap.Listener):
         
         if len(self.buffer) >= FRAME_BUFFER_LIM:# length of buffer is or exceeds our global limit
             print("==Entered The BUFFER LOGIC==\n\n\n")
-            with API_CALL_HANDLER(ip=IP_ADDRESS, port=PORT, api=API_ADDRESS, user=ADMIN, passw=PASS) as api_call:
-                resp = api_call.send_response(uid=values[0], data=joint_data)#send our averaged data to REST API
+           
+            resp = self.call_handler.send_response(uid=values[0], data=joint_data)#send our averaged data to REST API
             print('===========Exited===========\n\n\n\n\n')
             self.i = self.i + 1
 
@@ -324,6 +325,7 @@ def hand_properties(frame):
     x = hand.palm_position[0] * (10 ** -3)#convert mm to meters
     y = hand.palm_position[1] * (10 ** -3)#convert mm to meters
     z = hand.palm_position[2] * (10 ** -3)#convert mm to meters
+
     avg_finger_dir = 1,1 ,1
     finger = hand.fingers[0]
     if len(fingers) < FRAME_BUFFER_LIM:
@@ -391,7 +393,14 @@ def average_angle(angles):
 
 def main():
 
+    # ip = input("Provide computer IP Address:")
+    # port = input("Provide port to use:")
+    # api = input("provide API to use:")
+
+    # user = input("Provide username:")
+    # passw = input("Provide password:")
     # Create a sample listener and controller
+    #listener = CustomListener(ip,port, api,user,passw)
     listener = CustomListener()
     controller = Leap.Controller()
 

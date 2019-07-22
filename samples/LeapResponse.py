@@ -29,8 +29,8 @@ class API_CALL_HANDLER:
     def credentials(self):
         return (self.user,self.passw,)
 
-    def send_response(self, uid=0, data=dummy_data()):#will provide dummy data by default
-        return requests.post( self.post_api_url(uid=uid), auth=self.credentials, json=data)
+    def send_response(self, uid=0, data={}):#will provide dummy data by default
+        return requests.post( self.post_api_url(uid=uid), auth=self.credentials(), json=data)
 
     # may have over-engineered this
     def __enter__(self):
@@ -41,17 +41,17 @@ class API_CALL_HANDLER:
 
         return None
 
-def dummy_data():
-    data = {'uid':10,
-     'robot_to_send': 1,
-      'executed':False,
-       "joint_1": "0.62",
-        "joint_2": "0.02",
-        "joint_3": "0.10",
-        "joint_4": "0.43",
-        "joint_5": "0.23",
-        "joint_6": "0.14"}
-    return data
+    def dummy_data(self):
+        data = {'uid':10,
+        'robot_to_send': 1,
+        'executed':False,
+        "joint_1": "0.62",
+            "joint_2": "0.02",
+            "joint_3": "0.10",
+            "joint_4": "0.43",
+            "joint_5": "0.23",
+            "joint_6": "0.14"}
+        return data
 
 '''Returns a request response in text format'''
 def receive_response():

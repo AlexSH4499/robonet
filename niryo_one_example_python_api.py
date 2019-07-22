@@ -48,7 +48,7 @@ def main():
     movement= dummy_movement()
     try:
         n = NiryoOne()
-
+        print(n.get_hardware_status())
         n.set_arm_max_velocity(100)
         n.move_pose(movement)
 
@@ -63,7 +63,8 @@ def debugging():
     try:
         rospy.init_node('niryo_one_example_python_api')
         n = NiryoOne()
-
+        n.auto_calibrate()
+        #original_data = open_connection_to_API()
         while True:
             print("\nCommencing cycle of requests...\n")
             original_data = open_connection_to_API()
@@ -78,10 +79,10 @@ def debugging():
             try:
 
                 n.set_arm_max_velocity(100)
-                for move in moves:
-                    print(move)
+                for idx,move in enumerate(moves):
+                    print('[{}]move:{}'.format(idx,move))
                     n.move_joints(move)
-                    time.sleep(.5)
+                    time.sleep(.25)
 
             except NiryoOneException as e:
                 print(e)
