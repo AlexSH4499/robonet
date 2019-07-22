@@ -26,7 +26,7 @@ This should be abstracted and separated into it's own logic and file
 
 import Leap, time
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
-from LeapResponse import send_response
+from LeapResponse import send_response, API_CALL_HANDLER
 
 FRAME_BUFFER_LIM = 1
 
@@ -126,6 +126,13 @@ class RobotStructure:
 
         return value
 
+    def params(self):
+        pars = ['uid','robot_to_send','executed']
+        
+        for joint in self.str_joints():
+            pars.append(joint)
+        return pars
+
     def __len__(self):
         return len(self._joints) #should be 6 here but must verify this works
 
@@ -153,10 +160,15 @@ class RobotData(OrderedDict):
                     for k,v in zip(self.params, self.values)
                      if k not in self.__params_to_remove()}
                      
-params = [ 'uid','robot_to_send','executed',
-            'joint_1','joint_2','joint_3',
-            'joint_4','joint_5','joint_6']
+# params = [ 'uid','robot_to_send','executed',
+#             'joint_1','joint_2','joint_3',
+#             'joint_4','joint_5','joint_6']#This being removes causes a problem on line 208, should consider making it use robot params itself
 
+IP_ADDRESS = '192.168.1.29'
+PORT='8000'
+API_ADDRESS='requests'
+ADMIN='mec123'
+PASS='mec123'
 class CustomListener(Leap.Listener):
 
     def __init__(self):
@@ -205,12 +217,13 @@ class CustomListener(Leap.Listener):
         for val in position:
             values.append(str(round(val,2)))
 
-        joint_data = OrderedDict(zip(params,values))#preserve the order of the joints
+        joint_data = OrderedDict(zip(self.robot.params(),values))#preserve the order of the joints
                                               #otherwise, our RESTAPI breaks due to values getting displaced
         
         if len(self.buffer) >= FRAME_BUFFER_LIM:# length of buffer is or exceeds our global limit
             print("==Entered The BUFFER LOGIC==\n\n\n")
-            resp = send_response(uid=values[0], data=joint_data)#send our averaged data to REST API
+            with API_CALL_HANDLER(ip=IP_ADDRESS, port=PORT, api=API_ADDRESS, user=ADMIN, passw=PASS) as api_call:
+                resp = api_call.send_response(uid=values[0], data=joint_data)#send our averaged data to REST API
             print('===========Exited===========\n\n\n\n\n')
             self.i = self.i + 1
 
@@ -339,7 +352,7 @@ def finger_properties(hand):
     maybe because we have to ensure there exists a finger in the hand to begin with'''
     #print(hand.fingers[0]+'\n')
     #finger_x, finger_y, finger_z = hand.fingers[0].direction
-    finger_x, finger_y, finger_z = 0,0,0
+    finger_x, finger_y, finger_z = 0, 0, 0
     return finger_x, finger_y, finger_z
 
 def convert_to_joints(properties):
@@ -370,6 +383,11 @@ def convert_to_joints(properties):
     print("\tJ1: %f | J2: %f | J3: %f | J4: %f | J5: %f | J6: %f\n\n"%(x,y,z,pitch,yaw,roll))
     return joint_1, joint_2, joint_3, joint_4, joint_5, joint_6,
 
+def average_angle(angles):
+    avg = 0
+    for angle in angles:
+        avg += angle
+    return avg/len(angles)
 
 def main():
 

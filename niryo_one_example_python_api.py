@@ -8,7 +8,7 @@ import json
 import requests
 
 #API ADDRESS
-API_ROOT = 'http://192.168.1.33:8000/requests/'#works as tested on Niryo robot
+API_ROOT = 'http://192.168.1.29:8000/requests/'#works as tested on Niryo robot
 #ask for data by maintaining a request open
 
 
@@ -16,13 +16,10 @@ def open_connection_to_API():
     session = requests.Session()
     session.verify = True
     req = session.get(API_ROOT)
-    # print(req.text)
     return req
 
 def cleanse_data(req):
     data = req.json()
-    # print(data)
-    # print('\n\n')
     for entry in data:#Each entry is an Ordered Dictionary Object
         entry.pop('uid')
         entry.pop('executed')
@@ -31,10 +28,6 @@ def cleanse_data(req):
 
 def extract_movement(data={}):
     movement = [float(v)  for k,v in sorted(data.items())]
-    #for k, v in data: error in Python 2, only works in 3
-    # for k,v in sorted(data.iteritems()):
-    #     joint = float(v)
-    #     movement.append(joint)
     return movement
 
 def movements(json_data=[]):
@@ -75,18 +68,6 @@ def debugging():
             print("\nCommencing cycle of requests...\n")
             original_data = open_connection_to_API()
             json_data = cleanse_data(original_data)
-            # print('Original data:')
-            # for idx, entry in enumerate(original_data):
-            #     print("[%d]: %s"%(idx,entry))
-            # print('\n')
-
-            # print('Json data:')
-            # for idx, entry in enumerate(json_data):
-            #     print("[%d]: %s"%(idx,entry))
-            # print('\n')
-            # for entry in  json_data:
-            #     print(entry)
-            # print('\n\n')
 
             moves = movements(json_data=json_data)
 

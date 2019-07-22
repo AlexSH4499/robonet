@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import action
 from roboIF.serializers import *
-from roboIF.models import Robot, WareHouse
+from roboIF.models import Robot, WareHouse, MovementRequest
 
 #/robots
 # class RobotList(APIView):
@@ -31,7 +31,7 @@ class RobotView(viewsets.ModelViewSet):
     def set_status(self,request, pk=None):
         if pk is None:
             msg ="Error Invalid private key"
-            return HtttpResponse(msg, status_code=404)
+            return HttpResponse(msg, status_code=404)
 
         robot = queryset.filter(pk)
 
@@ -63,6 +63,11 @@ class RequestsView(viewsets.ModelViewSet):
     # def create_request(self, request, pk=None):
     #
     #     return
+
+    def delete(self, requests):
+
+        MovementRequest.objects.all().delete()
+        return HttpResponse()
 
     def post(self, request,pk):
         serializer = RequestSerializer(data=request.data)
