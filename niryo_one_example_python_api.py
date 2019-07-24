@@ -63,7 +63,7 @@ def debugging():
     try:
         rospy.init_node('niryo_one_example_python_api')
         n = NiryoOne()
-        n.auto_calibrate()
+        # n.auto_calibrate()
         #original_data = open_connection_to_API()
         while True:
             print("\nCommencing cycle of requests...\n")

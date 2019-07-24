@@ -28,7 +28,7 @@ import Leap, time
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 from LeapResponse import send_response, API_CALL_HANDLER
 
-FRAME_BUFFER_LIM = 1
+FRAME_BUFFER_LIM = 28
 
 def truncate(num, digs):
     return math.trunc(10** digs * num)/ 10**digs
@@ -371,7 +371,7 @@ def convert_to_joints(properties):
     distance_x_z = math.sqrt(x ** 2 + z**2)
     distance_org = math.sqrt(x ** 2 + y ** 2 +z**2)
     # we should validate that the values are within params
-    joint_1 = pitch #joint 1 - base (X-Z axis)#XZ Plane Rotation | base motor
+    joint_1 = roll #joint 1 - base (X-Z axis)#XZ Plane Rotation | base motor
     joint_2 = yaw #_yaw | main vertical trunk XY rotation
     joint_3 = finger_yaw # top joint XY plane rotation
     joint_4 = roll#| X-Z arm |
@@ -391,7 +391,7 @@ def average_angle(angles):
         avg += angle
     return avg/len(angles)
 
-def main():
+def main(ip='192.168.1.27', port=8000, api='requests', user='mec123',passw='mec123'):
 
     # ip = input("Provide computer IP Address:")
     # port = input("Provide port to use:")
@@ -401,7 +401,7 @@ def main():
     # passw = input("Provide password:")
     # Create a sample listener and controller
     #listener = CustomListener(ip,port, api,user,passw)
-    listener = CustomListener()
+    listener = CustomListener(ip, port,api,user,passw)
     controller = Leap.Controller()
 
     # Have the sample listener receive events from the controller
