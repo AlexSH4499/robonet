@@ -12,10 +12,10 @@ API_ROOT = 'http://192.168.1.29:8000/requests/'#works as tested on Niryo robot
 #ask for data by maintaining a request open
 
 
-def open_connection_to_API():
+def open_connection_to_API(api=API_ROOT):
     session = requests.Session()
     session.verify = True
-    req = session.get(API_ROOT)
+    req = session.get(api)
     return req
 
 def cleanse_data(req):
@@ -32,8 +32,6 @@ def extract_movement(data={}):
 
 def movements(json_data=[]):
     moves = [ extract_movement(data=entry) for entry in json_data]
-    # for entry in  json_data:
-    #     moves.append(extract_movement(data=entry))
 
     for idx,move in enumerate(moves):
         print('[%d]:%s'%(idx,move))
@@ -63,7 +61,7 @@ def debugging():
     try:
         rospy.init_node('niryo_one_example_python_api')
         n = NiryoOne()
-        # n.auto_calibrate()
+        n.calibrate_auto()
         #original_data = open_connection_to_API()
         while True:
             print("\nCommencing cycle of requests...\n")
@@ -86,6 +84,8 @@ def debugging():
 
             except NiryoOneException as e:
                 print(e)
+                print("Calibrating robot\n\n")
+                n.calibrate_auto()
 
             finally:
                 #mark all requests as processed
@@ -100,6 +100,7 @@ def debugging():
            
     except KeyboardInterrupt:
         print("Niryo Session Terminated\n\n")
+        
     return
 
 if __name__ == "__main__":

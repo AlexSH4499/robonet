@@ -134,7 +134,7 @@ class RobotStructure:
         return pars
 
     def __len__(self):
-        return len(self._joints) #should be 6 here but must verify this works
+        return 1
 
     #we need to fix this, somehow idk...
     def __str__(self):
