@@ -10,6 +10,7 @@ PORT = '8000'
 ADMIN = 'mec123'
 PASS = 'mec123'
 
+
 class API_CALL_HANDLER:
 
     def __init__(self, ip=IP_ADDRESS, port=PORT, api=API_ADDRESS, user=ADMIN, passw=PASS):
@@ -21,7 +22,7 @@ class API_CALL_HANDLER:
         return
 
     def api_url(self):
-        return 'http://'+self.ip_address+':'+self.port+ '/' + self.api_address+'/'
+        return 'http://'+self.ip_address+':'+str(self.port)+ '/' + self.api_address+'/'
     
     def post_api_url(self,uid=0):
         return self.api_url() +str(uid)+'/'
@@ -40,7 +41,7 @@ class API_CALL_HANDLER:
     def __exit__(self, exception_type, exception_value, traceback):
 
         return None
-
+  
     def dummy_data(self):
         data = {'uid':10,
         'robot_to_send': 1,

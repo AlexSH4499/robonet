@@ -61,7 +61,7 @@ def debugging():
     try:
         rospy.init_node('niryo_one_example_python_api')
         n = NiryoOne()
-        n.calibrate_auto()
+        #n.calibrate_auto()
         #original_data = open_connection_to_API()
         while True:
             print("\nCommencing cycle of requests...\n")
@@ -80,29 +80,32 @@ def debugging():
                 for idx,move in enumerate(moves):
                     print('[{}]move:{}'.format(idx,move))
                     n.move_joints(move)
-                    time.sleep(.25)
+                    time.sleep(.125)
 
             except NiryoOneException as e:
                 print(e)
                 print("Calibrating robot\n\n")
-                n.calibrate_auto()
+                #n.calibrate_auto()
 
             finally:
                 #mark all requests as processed
                 for data in original_data.json():
-                    data['executed'] = True
+                    #data['executed'] = True
                     #update database
-                    requests.put(API_ROOT + str(data['uid']) + '/',
-                                        data=data,auth=('mec123','mec123'))
+                    # requests.put(API_ROOT + str(data['uid']) + '/',
+                    #                     data=data,auth=('mec123','mec123'))
+                    requests.delete(API_ROOT + str(data['uid']) + '/',
+                                       auth=('mec123','mec123'))
                 json_data = []
                 original_data = []
         
-           
+                print(original_data)
+                print(json_data)
     except KeyboardInterrupt:
         print("Niryo Session Terminated\n\n")
         
     return
 
 if __name__ == "__main__":
-    #main()'
+    #main()
     debugging()

@@ -28,7 +28,7 @@ import Leap, time
 from Leap import CircleGesture, KeyTapGesture, ScreenTapGesture, SwipeGesture
 from LeapResponse import send_response, API_CALL_HANDLER
 
-FRAME_BUFFER_LIM = 28
+FRAME_BUFFER_LIM = 14
 
 def truncate(num, digs):
     return math.trunc(10** digs * num)/ 10**digs
@@ -160,9 +160,6 @@ class RobotData(OrderedDict):
                     for k,v in zip(self.params, self.values)
                      if k not in self.__params_to_remove()}
                      
-# params = [ 'uid','robot_to_send','executed',
-#             'joint_1','joint_2','joint_3',
-#             'joint_4','joint_5','joint_6']#This being removed causes a problem on line 208, should consider making it use robot params itself
 
 IP_ADDRESS = '192.168.1.29'
 PORT='8000'
@@ -363,13 +360,6 @@ def convert_to_joints(properties):
 
     x, y, z, pitch, yaw, roll, finger_yaw = properties
 
-    if properties[0] != 0:
-        y_x_scaling = properties[1] / properties[0]# y / x
-    else:
-        y_x_scaling = 1
-
-    distance_x_z = math.sqrt(x ** 2 + z**2)
-    distance_org = math.sqrt(x ** 2 + y ** 2 +z**2)
     # we should validate that the values are within params
     joint_1 = roll #joint 1 - base (X-Z axis)#XZ Plane Rotation | base motor
     joint_2 = yaw #_yaw | main vertical trunk XY rotation
@@ -391,16 +381,8 @@ def average_angle(angles):
         avg += angle
     return avg/len(angles)
 
-def main(ip='192.168.1.27', port=8000, api='requests', user='mec123',passw='mec123'):
+def main(ip='192.168.1.29', port=8000, api='requests', user='mec123',passw='mec123'):
 
-    # ip = input("Provide computer IP Address:")
-    # port = input("Provide port to use:")
-    # api = input("provide API to use:")
-
-    # user = input("Provide username:")
-    # passw = input("Provide password:")
-    # Create a sample listener and controller
-    #listener = CustomListener(ip,port, api,user,passw)
     listener = CustomListener(ip, port,api,user,passw)
     controller = Leap.Controller()
 
@@ -417,18 +399,4 @@ def main(ip='192.168.1.27', port=8000, api='requests', user='mec123',passw='mec1
 if __name__ == "__main__":
     main()
 
-# import unittest
-
-# class RobotTest(unittest.TestCase):
-
-#     def test_len(self):
-#         robot = RobotStructure()
-#         self.assertTrue(len(robot) == 6)
-
-#     from hypothesis import given
-#     from hypothesis.strategies import floats
-
-#     @given(value=floats())
-#     def test_lims(self, value, robot=RobotStructure()):
-#         assert robot.assert_joint_limits('joint_1', value) == truncate(robot.joints_limits()['joint_1'],2)
        

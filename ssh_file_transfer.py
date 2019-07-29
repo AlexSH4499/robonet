@@ -1,6 +1,6 @@
+'''This file is in charge of sending the corresponding scripts to the robot into their respective directories'''
 
-
-ROBOT_IP_ADDRESS = '192.168.1.27'#OR 36
+ROBOT_IP_ADDRESS = '192.168.1.63'#OR 36 OR 63 OR 27
 USER= 'niryo'
 PASS = 'robotics'
 
@@ -129,6 +129,22 @@ def connect():
 
     return
 
+def setup_robot_env(niryo_script=NIRYO_API_SCRIPT, api_dir=REMOTE_LIBRARY_DIR, home='/home/niryo/'):
+
+    try:
+        send_file(hostname=ROBOT_IP_ADDRESS, hostkey=None, username=USER,password=PASS,
+                 file_to_send=niryo_script,directory=api_dir)
+
+        send_file(hostname=ROBOT_IP_ADDRESS, hostkey=None, username=USER,password=PASS,
+                 file_to_send='launch.sh',directory=home)
+    except Exception as e:
+        print("*** Caught exception: %s: %s" % (e.__class__, e))
+        traceback.print_exc()
+        sys.exit(1)
+
+    return
+    
+
 
 if __name__ == '__main__':
-    connect()
+    setup_robot_env()
