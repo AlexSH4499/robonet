@@ -1,18 +1,37 @@
 <h2>Requests</h2>
 
-<div *ngFor="let request of requests | async">
+<div class="mdc-data-table" *ngFor="let request of requests | async">
     <p>Inside the for</p>
-    <table>
-        <tr>
-            <th>{{request.uid}}</th>
-            <th>{{request.executed}}</th>
-            <th>{{request.robot_to_send}}</th>
-            <th>{{request.joint_1}}</th>
-            <th>{{request.joint_2}}</th>
-            <th>{{request.joint_3}}</th>
-            <th>{{request.joint_4}}</th>
-            <th>{{request.joint_5}}</th>
-            <th>{{request.joint_6}}</th>
-        </tr>
+    <table class="mdc-data-table__table">
+
+        <thead>
+                <tr class="mdc-data-table__header-row">
+                        <th class="mdc-data-table__cell">UID</th>
+                        <th class="mdc-data-table__cell">Executed</th>
+                        <th class="mdc-data-table__cell">Robot</th>
+                        <th class="mdc-data-table__cell">Joint 1</th>
+                        <th class="mdc-data-table__cell">Joint 2</th>
+                        <th class="mdc-data-table__cell">Joint 3</th>
+                        <th class="mdc-data-table__cell">Joint 4</th>
+                        <th class="mdc-data-table__cell">Joint 5</th>
+                        <th class="mdc-data-table__cell">Joint 6</th>
+                </tr>
+        </thead>
+
+        <tbody>
+
+                <tr class="mdc-data-table__content">
+                        <th class="mdc-data-table__cell">{{request.uid}}</th>
+                        <th class="mdc-data-table__cell">{{request.executed}}</th>
+                        <th class="mdc-data-table__cell">{{request.robot_to_send}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_1}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_2}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_3}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_4}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_5}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_6}}</th>
+                </tr>
+        </tbody>
+        
     </table>
 </div>

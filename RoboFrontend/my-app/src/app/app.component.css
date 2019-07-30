@@ -1,4 +1,19 @@
 
+.form-container{
+    
+    /* display: inline-block; */
+    /* margin: 1%; */
+    /* background: #828385; */
+    
+    background: #383838;
+    color:#ffffff;
+    width: 50%;
+    height:100%;
+    margin-left: 25%;
+    border-radius: 10px;
+    border-bottom: #828385;
+    padding: 1%;
+}
 
 .table-head{
     background: #828385;
@@ -15,6 +30,11 @@ table{
     border-radius: 5px; 
     border-collapse: collapse;
 }
+/* 
+body{
+    background-color: #828385;
+} */
+
 
 tr{
     text-align: center;
@@ -35,15 +55,28 @@ th{
 
 .grid-container{
     display: grid;
+    width:100%;
+    height:100%;
+    background-color: #f8f7f7;
 }
 
 .table-container{
+    margin: 1%;
+    padding: 1%;
+    align-content: center;
+}
+
+.mdc-data-table{
+    margin:1%;
     padding: 1%;
     align-content: center;
 }
 
 .top{
-    text-size-adjust: 15%;
+    /* height: 30%; */
+    
+    margin-bottom: 1%;
+    text-size-adjust: 30%;
     font-weight: bold;
     text-align: center;
     padding:0.1%;
@@ -51,7 +84,7 @@ th{
     color: #ffffff;
 }
 
-.post-button{
+/* .post-button{
     font-size: 2.5em;
     color: #ffffff;
     background:  #CD040B;
@@ -59,4 +92,4 @@ th{
     border-radius: 5px;
     border: none;
    
-}
+} */

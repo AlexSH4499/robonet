@@ -10,7 +10,9 @@ import {FormsModule} from '@angular/forms';
 import {ReactiveFormsModule} from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import {MDCDataTable} from '@material/data-table';
 import {MatButtonModule, MatCheckboxModule, MatSliderModule} from '@angular/material';
+
 @NgModule({
   declarations: [
     AppComponent,

@@ -6,7 +6,7 @@
   </div>
 
 
-  <div class="table-container">
+  <!-- <div class="table-container">
       <table class="hoverTable">
           <tr class="table-head" > 
                   
@@ -37,15 +37,50 @@
 
 
       </table>
-    </div>
+    </div> -->
+    
+    
+<div class="mdc-data-table" >
+    
+    <table class="mdc-data-table__table">
 
+        <thead>
+                <tr class="mdc-data-table__header-row">
+                        <th class="mdc-data-table__cell">UID</th>
+                        <th class="mdc-data-table__cell">Executed</th>
+                        <th class="mdc-data-table__cell">Robot</th>
+                        <th class="mdc-data-table__cell">Joint 1</th>
+                        <th class="mdc-data-table__cell">Joint 2</th>
+                        <th class="mdc-data-table__cell">Joint 3</th>
+                        <th class="mdc-data-table__cell">Joint 4</th>
+                        <th class="mdc-data-table__cell">Joint 5</th>
+                        <th class="mdc-data-table__cell">Joint 6</th>
+                </tr>
+        </thead>
+        <tbody>
+
+                <tr class="mdc-data-table__content" *ngFor='let request of requests'>
+                        <th class="mdc-data-table__cell">{{request.uid}}</th>
+                        <th class="mdc-data-table__cell">{{request.executed}}</th>
+                        <th class="mdc-data-table__cell">{{request.robot_to_send}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_1}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_2}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_3}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_4}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_5}}</th>
+                        <th class="mdc-data-table__cell">{{request.joint_6}}</th>
+                </tr>
+        </tbody>
+        
+    </table>
+</div>
 
   <!-- <div class="post-container">
 
     <button class="post-button" (click)="post()">Post</button>
   </div> -->
 
-  <div>{{moveModel | json}}</div>
+  <!-- <div>{{moveModel | json}}</div> -->
 
   <div class="form-container"> 
 
