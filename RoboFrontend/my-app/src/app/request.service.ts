@@ -33,10 +33,6 @@ export class RequestService{
 
     requests  ;
 
-    // askServerForRequests(){
-    //     // Here we need to identify how to make HTTP requests to our django server
-    // }
-
     constructor(private http: HttpClient){
         this.requests = [];
     }
@@ -63,7 +59,6 @@ export class RequestService{
     }
 
     getRequests(){
-        // return this.requests;
         this.requests = this.http.get<RequestComponent[]>(DJANGO_API);
         return this.requests;
     }

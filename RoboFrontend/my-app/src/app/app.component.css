@@ -1,18 +1,15 @@
 
 .form-container{
-    
-    /* display: inline-block; */
-    /* margin: 1%; */
-    /* background: #828385; */
+
     
     background: #383838;
     color:#ffffff;
     width: 50%;
-    height:100%;
+    height:65%;
     margin-left: 25%;
     border-radius: 10px;
     border-bottom: #828385;
-    padding: 1%;
+    padding: 5%;
 }
 
 .table-head{
@@ -30,10 +27,6 @@ table{
     border-radius: 5px; 
     border-collapse: collapse;
 }
-/* 
-body{
-    background-color: #828385;
-} */
 
 
 tr{
@@ -72,11 +65,13 @@ th{
     align-content: center;
 }
 
+p{
+    padding-top: 2.0%;
+}
 .top{
     /* height: 30%; */
-    
     margin-bottom: 1%;
-    text-size-adjust: 30%;
+    font-size-adjust: 1.5;
     font-weight: bold;
     text-align: center;
     padding:0.1%;

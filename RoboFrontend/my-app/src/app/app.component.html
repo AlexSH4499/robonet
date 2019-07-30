@@ -5,47 +5,13 @@
     <p>Robot Requests</p>
   </div>
 
-
-  <!-- <div class="table-container">
-      <table class="hoverTable">
-          <tr class="table-head" > 
-                  
-              <th>UID</th>
-              <th>Execution Status</th>
-              <th>Robot Assigned</th>
-              <th>Joint 1</th>
-              <th>Joint 2</th>
-              <th>Joint 3</th>
-              <th>Joint 4</th>
-              <th>Joint 5</th>
-              <th>Joint 6</th>
-          </tr>
-              
-              <tr  *ngFor='let request of requests' style="text-align:center">
-
-                  <th>{{request.uid}}</th>
-                  <th>{{request.executed}}</th>
-                  <th>{{request.robot_to_send}}</th>
-                  <th>{{request.joint_1}}</th>
-                  <th>{{request.joint_2}}</th>
-                  <th>{{request.joint_3}}</th>
-                  <th>{{request.joint_4}}</th>
-                  <th>{{request.joint_5}}</th>
-                  <th>{{request.joint_6}}</th>
-              </tr>
-        
-
-
-      </table>
-    </div> -->
-    
     
 <div class="mdc-data-table" >
     
     <table class="mdc-data-table__table">
 
         <thead>
-                <tr class="mdc-data-table__header-row">
+                <tr class="mdc-data-table__header-row" style="color:white; background:black;">
                         <th class="mdc-data-table__cell">UID</th>
                         <th class="mdc-data-table__cell">Executed</th>
                         <th class="mdc-data-table__cell">Robot</th>
@@ -75,12 +41,6 @@
     </table>
 </div>
 
-  <!-- <div class="post-container">
-
-    <button class="post-button" (click)="post()">Post</button>
-  </div> -->
-
-  <!-- <div>{{moveModel | json}}</div> -->
 
   <div class="form-container"> 
 
@@ -89,11 +49,7 @@
     </app-request>
 
   </div>
-  
-  <!-- <div class="form-container">
 
-      <app-request></app-request>
-  </div> -->
   
 </div>
 <router-outlet></router-outlet>

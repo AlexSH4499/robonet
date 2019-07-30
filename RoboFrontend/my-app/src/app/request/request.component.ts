@@ -47,6 +47,10 @@ export class RequestComponent implements OnInit {
     });
     this.data = this.requestService.getRequests();
   }
+  
+  onReset(){
+      this.requestForm.reset();
+  }
 
   onSubmit(requestData){
       console.warn('Request for robot has been submitted', requestData);
