@@ -91,3 +91,6 @@ _Ensure the script is in same directory as Leap Motion Developer Kit. Note, this
 - Leap Motion SDK randomly decides to stop working and won't detect the Leap Motion Sensor.
 
 > Possible fix: Reinstallation of Official SDK seems to fix this issue on Windows OS'.
+
+- __launch.sh__ won't run in Linux environment due to being created originally on Windows (saved as a DOS format)
+> Fix: Copy paste the contained info into a new file then, run the command __chmod +x "filename"__ to make it executable
