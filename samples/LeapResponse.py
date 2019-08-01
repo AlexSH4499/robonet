@@ -10,7 +10,7 @@ PORT = '8000'
 ADMIN = 'mec123'
 PASS = 'mec123'
 
-
+#TODO : Consider moving this to a different file as it has logic that doesn't fit with the LEAP MOTION SENSOR
 class API_CALL_HANDLER:
 
     def __init__(self, ip=IP_ADDRESS, port=PORT, api=API_ADDRESS, user=ADMIN, passw=PASS):

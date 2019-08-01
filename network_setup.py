@@ -4,6 +4,7 @@ import nmap
 
 #print((([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] if not ip.startswith("127.")] or [[(s.connect(("8.8.8.8", 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]]) + ["no IP found"])[0])
 
+#This won't work due to not having the library installed
 def find_ip_by_ssid(ssid=''):
     if ssid.strip() is None:
         raise Exception("Sorry SSID cannot be empty")
@@ -19,21 +20,19 @@ def find_ip_by_ssid(ssid=''):
     print('@ERROR: SSID not found!\n\n')
     return None
 
-
 def find_host_ip():
     hostname = socket.gethostname()
     IP = socket.getfqdn(hostname)
     return socket.gethostbyname(IP)
 
 def find_client_ip(name_search=''):#we need to ask user for exact robot name
-    #remote_hostname = 'robots name'
     client_ip =''
     try:
         ip = socket.getfqdn(name_search.strip())
-        print(ip)
+        print("Hostname of client:{}".format(ip))
         # client_ip = socket.gethostbyname(ip)
         client_ip = socket.gethostbyname(name_search.strip())
-        print(client_ip)
+        print("Client IP Address:{}\n\n".format(client_ip))
     except Exception as e:
         print("Could not find robot on network, make sure the name provided is correct and that robot is on the same network...")
         print(e)
@@ -42,7 +41,11 @@ def find_client_ip(name_search=''):#we need to ask user for exact robot name
 
 def create_client_settings(ssid='',user='', passw=''):
     
-    client_ip = find_client_ip(ssid)
+    if ssid.lower() == 'default':
+        client_ip = find_client_ip("")
+    
+    else:
+        client_ip = find_client_ip(ssid)
 
     with open("client_settings.txt", "w") as file:
         file.write("IP:{}\n".format(client_ip))
@@ -61,6 +64,32 @@ def create_network_settings(ip_address='', front_port='',back_port=''):#could be
         print(e)
 
     return
+
+def load_network_settings():
+    setts = {}
+
+    with open("network_settings.txt",'r') as file:
+        lines = file.readlines()
+
+        for line in lines:
+            splitted = line.split(":")
+            k, v = splitted[0], splitted[1]
+            setts[k] = v
+    
+    return setts
+
+def load_client_settings():
+    setts = {}
+
+    with open("client_settings.txt",'r') as file:
+        lines = file.readlines()
+
+        for line in lines:
+            splitted = line.split(":")
+            k, v = splitted[0], splitted[1]
+            setts[k] = v
+    
+    return setts
 
 def input_loop(ssid='',user='',passw=''):
     inputs = {}#robot name, user, password
@@ -89,6 +118,7 @@ def input_loop(ssid='',user='',passw=''):
             if  'passw' not in inputs.keys():
                 passw = input("Robot login password(no whitespaces please):").strip()
                 inputs['passw'] = passw
+                print()
 
         except Exception as e:
             print(e)
@@ -106,5 +136,5 @@ def main(user='',passw=''):
         print(e)
 
 if __name__ == "__main__":
-    # main()
-    find_ip_by_ssid(ssid='Niryo')#Not tested yet
+    main()
+    #find_ip_by_ssid(ssid='Niryo')#Not tested yet
