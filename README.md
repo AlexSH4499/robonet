@@ -39,48 +39,53 @@
 - requests
 - django
 - django-restframework
-
+- paramiko (Python 2.7)[This is a commodity and not a necessity for transferring the scripts onto the robot]
   
 ---
   
 **NOTE**
 _This portion makes the assumption that all necessary packages have been previously installed with pip._
 
+## Setting up HTTP Server
 
 >Open a terminal and change into the directory for this project.
 
 >Activate virtualenv for Python  2.7 and proceed to change directory into RESTAPI folder.
 
->Once inside the folder, execute the command "python manage.py runserver 192.168.1.21:8000".
+>Once inside the folder, execute the command "python manage.py runserver {your_computers_ip}:8000".
 
 >This command will make the HTTP server run on port 8000 such that we can communicate with it using our robot.
 
->Now that it's running we can open up another terminal, change again into the project's main folder and when inside activate a Python 3.7.x+ environment.
+**IMPORTANT** _The IP Address {your_computers_ip} affects how the scripts behave so make sure to change the variables: ip, port in leap_motion_controller.py, server_ip from  **if __name__ == "__main__"** in niryo_one_python_example.py ROBOT_IP_ADDRESS in ssh_file_transfer.py_
+## Connecting to Leap Motion Controller 
 
->Once this step is finished, execute the following command "python leap_motion_controller.py" and this will cause the terminal to seek the Leap Motion USB device.
+>Now that the HTTP Server is running we can open up another terminal, change again into the project's main folder and activate a Python 3.7.x+ environment.
+---
+
+>To Run leap_motion_controller.py make sure to be using Python 2.7 virtualenv
+
+_Ensure the script is in same directory as Leap Motion Developer Kit. Note, this script is designed to run on Windows OS due to src_dir(assumes  SDK is installed directly on C drive) variable and path insertion of SDK using Windows style directories. If you wish to run this in Linux, make the appropriate changes to src_dir and the path insertion at the top of the python script file._
+
+> Run the command _python leap_motion_controller.py_ in the command line and await _*Connected*_ to appear on screen.
 
 _If you're encountering problems, **verify** that your **environment variable (or PATH)** has the proper **Python & Python version active**._
 
 >Wait until the terminal says "Connected" to confirm that we are properly communicating with the Leap Motion sensor.
 
 _Sometimes the **Leap SDK ignores** the USB device and requires a **fresh install**._
+---
 
->After establishing the connection, open yet another terminal and open an SSH connection
+
+
+## Connecting to the Niryo Robot
+>After establishing the connection with LeapMotion controller, open yet another terminal and establish an SSH connection
   to the Niryo robot using the command "ssh niryo@{ip_address_here}".
   
-_Replace **{ip_address_here}** with the IP Address of your choice but be mindful that both must be kept within the same LAN or ensure a properly established connection between Computer & Robot._
+_Replace **{ip_address_here}** with the IP Address of the robot on the network but be mindful that both must be kept within the same LAN or ensure a properly established connection between Computer & Robot._
   
  _In my case, I setup the **IP Address** to be **192.168.1.53** in order to ensure that both, computer and robot, were on the same network as per IPv4 protocol.(Assume the Subnet-Mask to be 24-bits)_
-
----
-
->To Run leap_motion_controller.py make sure to be using Python 2.7 virtualenv
-
-_Ensure the script is in same directory as Leap Motion Developer Kit. Note, this script is designed to run on Windows OS due to src_dir(assumes  SDK is installed directly on C drive) variable and path insertion of SDK using Windows style directories. If you wish to run this in Linux, make the appropriate changes to src_dir and the path insertion._
-
-> Run the command _python leap_motion_controller.py_ in the command line and await _*Connected*_ to appear on screen.
-
----
+ 
+ **IMPORTANT** _The IP Address {ip_address_here} affects how the scripts behave so make sure to change the variables: ROBOT_IP_ADDRESS in ssh_file_transfer.py_
 
 # Known Problems
 
