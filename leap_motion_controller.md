@@ -30,6 +30,14 @@
   - state_string(self, state)
   - __init__(self, ip=IP_ADDRESS, port=PORT,api=API_ADDRESS,user=ADMIN,passw=PASS)
 
+- Global Variables
+    - IP_ADDRESS = '192.168.1.29'
+    - PORT='8000'
+    - API_ADDRESS='requests'
+    - ADMIN='mec123'
+    - PASS='mec123'
+    - FRAME_BUFFER_LIM = 14
+    - fingers = [ ]
 ---
 
 ## RobotStructure
