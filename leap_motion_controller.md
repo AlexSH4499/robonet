@@ -70,12 +70,62 @@
   >> This is used to create the JSON that is sent to the REST API
   
   - __init__(self,uid=0, name="")
-  - __len__(self)
-  - __str__(self)
+  >> Called when creating a new Object and initializes the instance variables:
+  >>  - uid - signed integer to identify the robot, defaults to 0 when not provided
+  >>  - name - string representation for name  of the robot, defaults to an empty string when not provided
+  >> - _ joints - Ordered dictionary initialized to defaults of _**joints_default_position**_ method
+  
+  - __ len __ (self)
+  >> Returns a length of '1' to let us iterate through lists of this object if needed
+  
+  - __ str __ (self)
+  >> Returns a string representation of the instance of _RobotStructure_ when using _**str**_ or _**print**_ standard library methods
 
 ---
+
+---
+
+## CustomListener
+> Class Method Descriptions
+
+  - on_init(self, controller)
+  >> Runs automatically when the script is executed and begins doing calls to Leap SDK
+  
+  - on_connect(self, controller)
+  >> Runs automatically when the Leap Motion sensor is connected and awaits _on_frame_ method
+  
+  - on_disconnect(self, controller)
+  >> Runs automatically when the Leap Motion sensor is disconnected and ends any calls to Leap SDK
+  
+  - on_exit(self, controller)
+  >> Runs when the program is exited after pressing 'Enter' key
+  
+  - __ empty(self, li=[])
+  >> Empties out the _li_ provided, but it's only used to empty our internal buffer from __ init __ method. Could be repurposed to use any mutable iterable realistically
+  
+  - on_frame(self, controller)
+  >> Executed automatically everytime a movement is registered from LeapMotion sensor
+  >> This is where all the processing of the Hand objects occurs and calls to RobotStructure are handled.
+  
+  - __ init __ (self, ip=IP_ADDRESS, port=PORT,api=API_ADDRESS,user=ADMIN,passw=PASS)
+  >> Called when creating a new Object and initializes the instance variables:
+  >>  - port - signed integer to identify the robot, defaults to PORT when not provided
+  >>  - ip - string representation for IP address  of the REST API, defaults to an IP_ADDRESS when not provided
+  >>  - user - string representation for user of the REST API, defaults to an ADMIN when not provided
+  >>  - passw - string representation for passw of the REST API, defaults to an PASS when not provided
+  >>  - api - string representation for API url  of the REST API, defaults to an API_ADDRESS when not provided
+
+
+---
+
 ## Functions
 - convert_to_joints(properties)
+>> Receives the properties from Hand object given by Leap Motion sensor and returns a tuple of 6  joint values (floating point numbers)
+
 - hand_properties(frame)
+>> Extracts the Hand object's properties from a Frame of the Leap Motion sensor
+>> Returns a  tuple of seven properties: x,y,z, pitch, yaw, roll, finger_yaw
+
 - main(ip='192.168.1.29', port=8000, api='requests', user='mec123',passw='mec123')
+>> Handles the logic of the sensor when the script gets executed, receives IP,port and route of API along with authentication. 
 
