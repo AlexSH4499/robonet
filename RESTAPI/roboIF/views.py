@@ -101,7 +101,7 @@ def list_models(model, uid):
     try:
         return model.objects.get(uid=uid)
     except ObjectDoesNotExist:
-        msq = f'There exist no objects of {uid}'
+        msg = f'There exist no objects of {uid}'
         raise ObjectDoesNotExist(msg)
 
 # Create your views here.

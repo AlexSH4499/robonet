@@ -8,7 +8,7 @@ import {RequestComponent, MovementRequest} from './request/request.component';
 /** This has to be changed if we are shoved out of the network.
  *  Run ipconfig or ifconfig to findout the current PC's ip address
  */
-const DJANGO_API = 'http://192.168.1.28:8000/requests/';
+const DJANGO_API = 'http://192.168.1.32:8000/requests/';
 //encodedCredentials = Base64.encode('mec123' + ':' + 'mec123');
 // const httpOptions = {
 //     headers: new HttpHeaders({

@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 
+import time
+import json
+import requests
+
+
 from niryo_one_python_api.niryo_one_api import *
 from LeapResponse import API_CALL_HANDLER
 import rospy
 
-import time
-import json
-import requests
 
 #API ADDRESS
 API_ROOT = 'http://192.168.1.29:8000/requests/'#works as tested on Niryo robot
@@ -59,51 +61,51 @@ def main():
     return
 
 def previous_debug():
-     try:
-            rospy.init_node('niryo_one_example_python_api')
-            n = NiryoOne()
-            #n.calibrate_auto()
-            #original_data = open_connection_to_API()
-            while True:
-                print("\nCommencing cycle of requests...\n")
-                original_data = open_connection_to_API()
-                json_data = cleanse_data(original_data)
+    try:
+        rospy.init_node('niryo_one_example_python_api')
+        n = NiryoOne()
+        #n.calibrate_auto()
+        #original_data = open_connection_to_API()
+        while True:
+            print("\nCommencing cycle of requests...\n")
+            original_data = open_connection_to_API()
+            json_data = cleanse_data(original_data)
 
-                moves = movements(json_data=json_data)
+            moves = movements(json_data=json_data)
 
-                if len(moves) <= 0 :
-                    time.sleep(.500)
-                    continue
+            if len(moves) <= 0 :
+                time.sleep(.500)
+                continue
 
-                try:
+            try:
 
-                    n.set_arm_max_velocity(100)
-                    for idx,move in enumerate(moves):
-                        print('[{}]move:{}'.format(idx,move))
-                        n.move_joints(move)
-                        time.sleep(.125)
+                n.set_arm_max_velocity(100)
+                for idx,move in enumerate(moves):
+                    print('[{}]move:{}'.format(idx,move))
+                    n.move_joints(move)
+                    time.sleep(.125)
 
-                except NiryoOneException as e:
-                    print(e)
-                    print("Calibrating robot\n\n")
-                    #n.calibrate_auto()
+            except NiryoOneException as e:
+                print(e)
+                print("Calibrating robot\n\n")
+                #n.calibrate_auto()
 
-                finally:
-                    #mark all requests as processed
-                    for data in original_data.json():
-                        #data['executed'] = True
-                        #update database
-                        # requests.put(API_ROOT + str(data['uid']) + '/',
-                        #                     data=data,auth=('mec123','mec123'))
-                        requests.delete(API_ROOT + str(data['uid']) + '/',
-                                        auth=('mec123','mec123'))
-                    json_data = []
-                    original_data = []
-            
-                    print(original_data)
-                    print(json_data)
-        except KeyboardInterrupt:
-            print("Niryo Session Terminated\n\n")
+            finally:
+                #mark all requests as processed
+                for data in original_data.json():
+                    #data['executed'] = True
+                    #update database
+                    # requests.put(API_ROOT + str(data['uid']) + '/',
+                    #                     data=data,auth=('mec123','mec123'))
+                    requests.delete(API_ROOT + str(data['uid']) + '/',
+                                    auth=('mec123','mec123'))
+                json_data = []
+                original_data = []
+        
+                print(original_data)
+                print(json_data)
+    except KeyboardInterrupt:
+        print("Niryo Session Terminated\n\n")
         
 
 def debugging(server_ip, server_port, api_point, username,passw):
@@ -137,7 +139,7 @@ def debugging(server_ip, server_port, api_point, username,passw):
                     #n.calibrate_auto()
 
                 finally:
-                    #mark all requests as processed
+                    #delete all requests as processed
                     for data in original_data.json():
                         requests.delete(API.api_url() + str(data['uid']) + '/',
                                         auth=(username,passw))
