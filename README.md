@@ -47,6 +47,24 @@
 **NOTE**
 _This portion makes the assumption that all necessary packages have been previously installed with pip._
 
+## Setting up Robot files and scripts
+---
+> Open a terminal (or commandline on Windows) and change into the project directory
+> Using Python 3 and paramiko installed run the command:
+>> __python ssh_file_transfer.py__
+> This will send the files: __launch.sh__ and __niryo_one_example_python_api.py__ to the robot.
+
+---
+>> **Potential Problem**: May require to send __samples/LeapResponse.py__. A possible fix is as simple as modifying the __ssh_file_transfer.py__ script in the main and adding a line:
+
+>> send_file(hostname=ROBOT_IP_ADDRESS, hostkey=None, username=USER,password=PASS,
+                 file_to_send=samples/LeapResponse.py,directory=api_dir) inside the setup_robot_env method
+---
+
+> You can keep this terminal open to be used for SSH into the robot under section __**Connecting to the Niryo Robot**__
+
+---
+
 ## Setting up HTTP Server
 
 >Open a terminal and change into the directory for this project.
@@ -62,6 +80,7 @@ _This portion makes the assumption that all necessary packages have been previou
 _The IP Address {your_computers_ip} affects how the scripts behave so make sure to change the variables:_
 - ip, port in leap_motion_controller.py
 - server_ip from  **if __name__ == "__main__"** in niryo_one_python_example.py
+
 ## Connecting to Leap Motion Controller 
 
 ---
