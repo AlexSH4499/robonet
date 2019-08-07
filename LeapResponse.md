@@ -10,7 +10,7 @@
     - ADMIN = 'mec123'
     - PASS = 'mec123'
     
-##Class Methods
+## Class Methods
  - send_response(self, uid=0, data={})
  >> Receives data from and OrderedDictionary and a uid and sends a POST request to API with credentials as a JSON 
  
