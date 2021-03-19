@@ -4,7 +4,7 @@ decorator==4.4.0
 Django==2.2.2
 django-cors-headers==3.0.2
 django-filter==2.1.0
-djangorestframework==3.9.4
+djangorestframework==3.11.2
 
 grpcio==1.21.1
 h5py==2.9.0
